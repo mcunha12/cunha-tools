@@ -1,0 +1,36 @@
+CUNHA TOOLS — INSTALAÇÃO
+
+Requisito: macOS 15 ou superior.
+
+1. Arraste "Cunha Tools" para a pasta "Aplicativos".
+2. Abra o Cunha Tools na pasta Aplicativos. O macOS bloqueia a primeira abertura, porque o app não é notarizado pela Apple.
+3. Abra Ajustes do Sistema > Privacidade e Segurança. Role até "Segurança" e clique em "Abrir Mesmo Assim". Confirme com a senha do Mac.
+   Alternativa no Terminal:
+   xattr -dr com.apple.quarantine "/Applications/Cunha Tools.app"
+4. Na janela do Cunha Tools, clique em "Instalar" na tool que quiser. A tool vai para a pasta Aplicativos e abre.
+5. Cada tool pede as próprias permissões na primeira abertura. O cartão da tool mostra o que falta. "Configurar" abre o ajuste da tool.
+6. "Abrir ao iniciar o Mac" liga ou desliga a abertura automática de cada tool.
+
+O Cunha Tools fecha quando a janela fecha. As tools continuam abertas.
+Para atualizar: abra a versão nova do Cunha Tools e clique em "Atualizar" no cartão da tool.
+Para remover: clique em "Remover". A tool fecha e vai para o Lixo.
+Se o macOS bloquear a atualização ou a remoção, ative o Cunha Tools em Ajustes do Sistema > Privacidade e Segurança > Gerenciamento de apps.
+
+
+SOUND MANAGER
+
+Na primeira abertura, clique em "Permitir" no pedido de "Gravação de áudio do sistema". Sem essa permissão, o volume por app não funciona.
+O ícone de alto-falante aparece na barra de menus.
+
+Volume por aba no Chrome:
+
+1. No menu do Sound Manager, clique na seta ao lado do Google Chrome.
+2. Clique em "Instalar extensão". O Finder abre a pasta da extensão, e o Chrome abre a página de extensões.
+3. Ative o "Modo do desenvolvedor", no canto superior direito da página.
+4. Clique em "Carregar sem compactação" e escolha a pasta aberta no Finder. O caminho já está copiado: na janela de escolha, use Cmd+Shift+G e depois Cmd+V.
+5. Recarregue as abas que já estavam abertas.
+
+Limites:
+
+- O controle por aba funciona no Chrome e em navegadores Chromium (Brave, Edge, Arc, Vivaldi, Opera). Safari e Firefox não têm controle por aba.
+- Em páginas chrome:// e na Chrome Web Store, só o mudo funciona.

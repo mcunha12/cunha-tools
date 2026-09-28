@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>pt-BR</string>
+	<key>CFBundleDisplayName</key>
+	<string>Sound Manager</string>
+	<key>CFBundleExecutable</key>
+	<string>SoundManager</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.marcelocunha.soundmanager</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Sound Manager</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.4.0</string>
+	<key>CFBundleVersion</key>
+	<string>4</string>
+	<key>CunhaToolRequirements</key>
+	<array>
+		<string>audioCapture</string>
+	</array>
+	<key>CunhaToolSummary</key>
+	<string>Volume e mudo por app, por aba do Chrome e volume geral do Mac.</string>
+	<key>CunhaToolSymbol</key>
+	<string>speaker.wave.2.fill</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>15.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSAudioCaptureUsageDescription</key>
+	<string>O Sound Manager lê o áudio de cada app para aplicar o volume e o mudo que você escolher.</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+</dict>
+</plist>
