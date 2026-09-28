@@ -1,5 +1,6 @@
 #!/bin/zsh
 # Builds every tool and the suite, then embeds the tools in build/Cunha Tools.app. ARCHS and SCRATCH work as in build.sh.
+# The suite's Info.plist gets CunhaSourceCommit from CUNHA_SOURCE_COMMIT, else from git; the update check compares it with GitHub.
 set -euo pipefail
 
 ROOT="${0:A:h:h}"
@@ -44,6 +45,13 @@ for APP in $BUILT_TOOLS; do
     rm -rf "$TARGET"
   fi
 done
+
+COMMIT="${CUNHA_SOURCE_COMMIT:-$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)}"
+if [[ -n "$COMMIT" ]]; then
+  plutil -replace CunhaSourceCommit -string "$COMMIT" "$SUITE/Contents/Info.plist"
+else
+  warn "sem commit de origem, o Checar atualizações vai oferecer atualização"
+fi
 
 # No --deep: each embedded tool keeps its own signature and identifier.
 codesign --force --sign "$IDENTITY" --keychain "$KEYCHAIN" \

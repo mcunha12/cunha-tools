@@ -25,6 +25,7 @@ O volume efetivo de um app é o menor valor entre o volume do app e o volume ger
 
 - Mexer num app nunca altera o volume geral.
 - Um app arrastado acima do volume geral para no volume geral.
+- Um clique perto da ponta da trilha leva a 0% ou a 100%.
 - Baixar o volume geral limita os apps que estão acima dele. O valor salvo de cada app se mantém. Quando o volume geral sobe de novo, cada app volta ao valor salvo.
 - No slider do app, a trilha acima do teto fica esmaecida, e um marcador mostra o teto. O percentual mostra o volume efetivo.
 - O volume por aba é relativo ao volume do app.
@@ -32,7 +33,8 @@ O volume efetivo de um app é o menor valor entre o volume do app e o volume ger
 ### Como funciona
 
 - O Sound Manager usa os *process taps* do Core Audio (macOS 15). Para cada app abaixo de 100%, o Sound Manager cria um tap que silencia o som original do app, aplica o ganho e toca o resultado no dispositivo de saída, por um dispositivo agregado.
-- Em 100%, o Sound Manager remove o tap 2 s depois. O áudio do app volta ao caminho normal do macOS.
+- Um app com volume próprio mantém o tap mesmo quando fica no teto. Assim, subir o volume geral só troca o ganho, sem esperar um tap novo.
+- Um app que volta a 100% perde o tap 2 s depois. O áudio dele volta ao caminho normal do macOS.
 - No dispositivo com volume próprio (ex.: alto-falantes do Mac), o ganho segue a curva de dB do próprio dispositivo. Um app em 30% soa igual ao dispositivo em 30%.
 - No dispositivo sem volume próprio (HDMI, alguns DACs), o volume geral funciona por software. A legenda do volume geral mostra "por software".
 - A extensão do navegador ajusta o volume dentro da página e conversa com o app por WebSocket em `ws://127.0.0.1:47821`.
@@ -85,6 +87,20 @@ xattr -dr com.apple.quarantine "/Applications/Cunha Tools.app"
 3. Ative o **Modo do desenvolvedor**, no canto superior direito.
 4. Clique em **Carregar sem compactação** e escolha a pasta. Na janela de escolha, `Cmd+Shift+G` e `Cmd+V` colam o caminho.
 5. Recarregue as abas que já estavam abertas.
+
+### Atualizar
+
+Na janela do Cunha Tools, clique em **Checar atualizações**. O botão compara o commit que gerou o app aberto com o último commit do `main` no GitHub. Se o `main` estiver à frente, o Cunha Tools:
+
+1. Baixa o código daquele commit.
+2. Compila com o `scripts/build-suite.sh` do próprio código, só na arquitetura do Mac. Download e build levaram 303 s num MacBook Air com a máquina ocupada.
+3. Atualiza as tools instaladas cuja versão ficou para trás e reabre as que estavam abertas.
+4. Troca o próprio app e reabre.
+
+- A atualização exige o Command Line Tools. Sem ele, o botão mostra o comando de instalação.
+- O build usa a identidade de assinatura local. Num Mac que instalou pelo DMG, a primeira atualização cria essa identidade, e o macOS pede de novo a permissão de áudio uma vez.
+- O log do último build fica em `~/Library/Logs/Cunha Tools/update.log`.
+- Uma tool só é trocada quando o `CFBundleVersion` dela sobe. Suba a versão a cada mudança numa tool.
 
 ### Distribuir em DMG
 
@@ -143,8 +159,9 @@ O resultado é `build/CunhaTools-<versão>.dmg`, com o atalho para Aplicativos e
 | `CunhaToolRequirements` | array | Permissões que a tool pede: `audioCapture`, `localNetwork` |
 | `CunhaToolSymbol` | string | SF Symbol do card |
 
-4. Na abertura, crie um `LaunchAtLogin`, chame `applyDefault()` nele e passe-o para `ToolControl.listen(launchAtLogin:openSetup:)`. Publique o estado de setup com `ToolStatus.publish(setupComplete:)`.
-5. Um script executável em `tools/<id>/build-hook.sh` roda antes da assinatura, com o caminho do `.app`. É opcional.
+4. Suba `CFBundleShortVersionString` e `CFBundleVersion` a cada mudança. O Checar atualizações só troca uma tool instalada com versão menor.
+5. Na abertura, crie um `LaunchAtLogin`, chame `applyDefault()` nele e passe-o para `ToolControl.listen(launchAtLogin:openSetup:)`. Publique o estado de setup com `ToolStatus.publish(setupComplete:)`.
+6. Um script executável em `tools/<id>/build-hook.sh` roda antes da assinatura, com o caminho do `.app`. É opcional.
 
 ## Testes
 
@@ -153,7 +170,10 @@ O Command Line Tools não executa XCTest nem swift-testing. Cada app traz autote
 | Comando | O que verifica |
 |---|---|
 | `CUNHA_INSTALL_DIR=<pasta> "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-install` | Catálogo, instalação, atualização e remoção numa pasta de teste |
+| `CUNHA_INSTALL_DIR=<pasta> [CUNHA_UPDATE_BRANCH=<branch>] "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-update` | Checar atualizações contra o GitHub real: decisão, download, build, commit gravado e troca da suíte numa pasta de teste. Leva até 5 minutos |
 | `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-ceiling` | Regras do teto e do ganho |
+| `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-slider` | Cliques e arraste no slider |
+| `open -n -W "build/Sound Manager.app" --stdout /tmp/rt.log --args --selftest-router` | Tempo de vida do tap num processo real |
 | `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-master` | Leitura e escrita do volume geral. Altera o volume real do Mac e restaura no fim |
 
 A lista completa, com os testes de áudio e da extensão, está em [`tools/sound-manager/README.md`](tools/sound-manager/README.md#verificação).
