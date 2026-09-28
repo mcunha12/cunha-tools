@@ -6,6 +6,8 @@ enum CeilingSelfTest {
         let arguments = CommandLine.arguments
         if arguments.contains("--selftest-ceiling") { exit(MainActor.assumeIsolated { run() }) }
         if arguments.contains("--selftest-master") { exit(MainActor.assumeIsolated { MasterSelfTest.run() }) }
+        if arguments.contains("--selftest-router") { exit(MainActor.assumeIsolated { RouterSelfTest.run() }) }
+        if arguments.contains("--selftest-slider") { SliderSelfTest.run() }
         return false
     }
 

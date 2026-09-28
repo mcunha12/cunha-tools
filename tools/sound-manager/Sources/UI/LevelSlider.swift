@@ -2,10 +2,13 @@ import SwiftUI
 
 // Slider 0...1 that stops at the ceiling; the track above the ceiling is dimmed.
 struct LevelSlider: View {
+    private enum Press { case knob(offset: CGFloat), track }
+
     let value: Double
     var ceiling: Double = 1
     let onChange: (Double) -> Void
     @Environment(\.isEnabled) private var isEnabled
+    @State private var press: Press?
 
     private let knobSize: CGFloat = 14
     private let trackHeight: CGFloat = 4
@@ -43,10 +46,12 @@ struct LevelSlider: View {
             .frame(width: width, height: geometry.size.height)
             .contentShape(Rectangle())
             .gesture(
-                DragGesture(minimumDistance: 0).onChanged { drag in
-                    guard isEnabled else { return }
-                    onChange(min(clamped(Double((drag.location.x - knobSize / 2) / travel)), ceiling))
-                }
+                DragGesture(minimumDistance: 0)
+                    .onChanged { drag in
+                        guard isEnabled else { return }
+                        onChange(min(level(for: drag, width: width), ceiling))
+                    }
+                    .onEnded { _ in press = nil }
             )
         }
         .frame(height: 18)
@@ -58,6 +63,21 @@ struct LevelSlider: View {
             case .decrement: onChange(max(value - step, 0))
             @unknown default: break
             }
+        }
+    }
+
+    // A press on the knob drags it from the grab point; a press on the track reaches 0% or 100% within one knob width of each end.
+    private func level(for drag: DragGesture.Value, width: CGFloat) -> Double {
+        let travel = max(width - knobSize, 1)
+        if press == nil {
+            let offset = drag.startLocation.x - (knobSize / 2 + travel * clamped(value))
+            press = abs(offset) <= knobSize / 2 ? .knob(offset: offset) : .track
+        }
+        switch press {
+        case .knob(let offset)?:
+            return clamped(Double((drag.location.x - offset - knobSize / 2) / travel))
+        default:
+            return clamped(Double((drag.location.x - knobSize) / max(width - 2 * knobSize, 1)))
         }
     }
 

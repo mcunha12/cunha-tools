@@ -5,6 +5,8 @@ struct RouteRequest {
     let key: String
     let processObjectIDs: Set<AudioObjectID>
     let gain: Float
+    // An app with its own volume keeps its tap at unity gain, so raising the main volume only changes the gain.
+    let keepsTap: Bool
 }
 
 @MainActor
@@ -14,6 +16,8 @@ final class AudioRouter {
     private var engines: [String: ProcessTapEngine] = [:]
     private var unitySince: [String: Date] = [:]
     private(set) var failures: [String: String] = [:]
+
+    var activeKeys: Set<String> { Set(engines.keys) }
 
     func apply(_ requests: [RouteRequest]) {
         guard let outputUID = OutputDevice.defaultUID() else { return }
@@ -26,12 +30,12 @@ final class AudioRouter {
         }
 
         for request in requests {
-            if request.gain >= 1, !keepAtUnity(request, outputUID: outputUID) {
+            if request.gain >= 1, !request.keepsTap, !keepAtUnity(request, outputUID: outputUID) {
                 engines[request.key]?.stop()
                 engines[request.key] = nil
                 continue
             }
-            if request.gain < 1 { unitySince[request.key] = nil }
+            if request.gain < 1 || request.keepsTap { unitySince[request.key] = nil }
 
             if let engine = engines[request.key], engine.processObjectIDs == request.processObjectIDs, engine.outputDeviceUID == outputUID {
                 engine.setGain(request.gain)

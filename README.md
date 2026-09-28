@@ -25,6 +25,7 @@ O volume efetivo de um app é o menor valor entre o volume do app e o volume ger
 
 - Mexer num app nunca altera o volume geral.
 - Um app arrastado acima do volume geral para no volume geral.
+- Um clique perto da ponta da trilha leva a 0% ou a 100%.
 - Baixar o volume geral limita os apps que estão acima dele. O valor salvo de cada app se mantém. Quando o volume geral sobe de novo, cada app volta ao valor salvo.
 - No slider do app, a trilha acima do teto fica esmaecida, e um marcador mostra o teto. O percentual mostra o volume efetivo.
 - O volume por aba é relativo ao volume do app.
@@ -32,7 +33,8 @@ O volume efetivo de um app é o menor valor entre o volume do app e o volume ger
 ### Como funciona
 
 - O Sound Manager usa os *process taps* do Core Audio (macOS 15). Para cada app abaixo de 100%, o Sound Manager cria um tap que silencia o som original do app, aplica o ganho e toca o resultado no dispositivo de saída, por um dispositivo agregado.
-- Em 100%, o Sound Manager remove o tap 2 s depois. O áudio do app volta ao caminho normal do macOS.
+- Um app com volume próprio mantém o tap mesmo quando fica no teto. Assim, subir o volume geral só troca o ganho, sem esperar um tap novo.
+- Um app que volta a 100% perde o tap 2 s depois. O áudio dele volta ao caminho normal do macOS.
 - No dispositivo com volume próprio (ex.: alto-falantes do Mac), o ganho segue a curva de dB do próprio dispositivo. Um app em 30% soa igual ao dispositivo em 30%.
 - No dispositivo sem volume próprio (HDMI, alguns DACs), o volume geral funciona por software. A legenda do volume geral mostra "por software".
 - A extensão do navegador ajusta o volume dentro da página e conversa com o app por WebSocket em `ws://127.0.0.1:47821`.
@@ -154,6 +156,8 @@ O Command Line Tools não executa XCTest nem swift-testing. Cada app traz autote
 |---|---|
 | `CUNHA_INSTALL_DIR=<pasta> "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-install` | Catálogo, instalação, atualização e remoção numa pasta de teste |
 | `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-ceiling` | Regras do teto e do ganho |
+| `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-slider` | Cliques e arraste no slider |
+| `open -n -W "build/Sound Manager.app" --stdout /tmp/rt.log --args --selftest-router` | Tempo de vida do tap num processo real |
 | `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-master` | Leitura e escrita do volume geral. Altera o volume real do Mac e restaura no fim |
 
 A lista completa, com os testes de áudio e da extensão, está em [`tools/sound-manager/README.md`](tools/sound-manager/README.md#verificação).

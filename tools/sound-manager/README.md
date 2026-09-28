@@ -31,10 +31,11 @@ O volume geral é o teto de cada app. O volume efetivo de um app é o menor valo
 - Arrastar um app acima do teto: o slider para no teto e o valor salvo fica no teto. O geral não muda.
 - Mexer num app nunca altera o geral.
 - Baixar o geral abaixo do valor salvo de um app: o app fica no teto e o valor salvo se mantém. Com o geral de volta acima, o app volta ao valor salvo.
+- Clique na trilha a até 14 pt (a largura do botão) de uma ponta leva a 0% ou a 100%. Clique no botão sem arrastar mantém o valor.
 - No slider de cada app, a trilha acima do teto fica esmaecida e um marcador indica o teto. O percentual mostra o volume efetivo. Com o app limitado, a dica do percentual mostra o valor salvo.
 - O volume por aba continua relativo ao app.
 
-Dispositivo com volume próprio (ex.: alto-falantes do Mac): o tap aplica a razão entre a amplitude do volume efetivo e a do geral, pela curva de dB do próprio dispositivo. Um app em 30% soa igual ao dispositivo em 30%. App no teto ou acima dele não passa por tap. Geral em 0 ou mudo: o dispositivo silencia sozinho, sem tap novo.
+Dispositivo com volume próprio (ex.: alto-falantes do Mac): o tap aplica a razão entre a amplitude do volume efetivo e a do geral, pela curva de dB do próprio dispositivo. Um app em 30% soa igual ao dispositivo em 30%. App com volume próprio mantém o tap mesmo no teto, com ganho 1. Assim, subir o geral só troca o ganho: 0,52 ms, contra 12 a 102 ms para criar um tap. App em 100% não passa por tap. Geral em 0 ou mudo: o dispositivo silencia sozinho, sem tap novo.
 
 Dispositivo sem volume próprio (HDMI, alguns DACs): o geral funciona por software, e a legenda mostra “por software”. Com o geral abaixo de 100%, todo app tocando som passa pelo tap, com ganho igual ao volume efetivo. O app guarda o geral por software por dispositivo (UID).
 
@@ -54,7 +55,7 @@ Depois de alterar arquivos em `Resources/BrowserExtension/`, clique de novo em �
 - Páginas `chrome://` e a Chrome Web Store bloqueiam scripts de extensão. Nelas, só o mudo funciona.
 - O volume por aba só vale para abas carregadas depois da instalação da extensão, ou para abas recarregadas.
 - Com volume abaixo de 100%, o áudio do app passa por um dispositivo agregado, o que acrescenta alguns milissegundos de latência. Em 100%, o app remove o tap 2 s depois.
-- Geral por software abaixo de 100%: um app que começa a tocar fica sem o teto até o tap entrar. Esse intervalo não foi medido.
+- Geral por software abaixo de 100%: um app que começa a tocar fica sem o teto até o tap entrar. Criar um tap levou de 12 a 102 ms nas medições num MacBook Air.
 
 ## Verificação
 
@@ -64,6 +65,8 @@ Depois de alterar arquivos em `Resources/BrowserExtension/`, clique de novo em �
 |---|---|
 | `"$APP/Contents/MacOS/SoundManager" --selftest-ceiling` | Regras do teto: volume efetivo, arraste acima do teto, ganho pela curva do dispositivo e por software, geral por software salvo por UID. Sai com código 1 em falha |
 | `"$APP/Contents/MacOS/SoundManager" --selftest-master` | Lê o volume e o mudo do dispositivo padrão, escreve outros valores, confere a leitura e o listener, e restaura os valores originais. Sai com código 1 em falha |
+| `"$APP/Contents/MacOS/SoundManager" --selftest-slider` | Cliques e arraste sintéticos num slider de 205 pt: pontas, meio, botão e teto. Sai com código 1 em falha |
+| `open -n -W "$APP" --stdout /tmp/rt.log --args --selftest-router` | Tempo de vida do tap num processo real, com ganho perto de 1 (inaudível), e tempo para subir o geral. Sai com código 1 em falha |
 | `"$APP/Contents/MacOS/SoundManager" --render-ui /tmp/menu.png --demo` | PNG do menu com três apps de exemplo e geral em 60%. `--software` mostra o geral por software |
 | `open -n "$APP" --stderr /tmp/st.log --args --selftest <pid> 0.5` | Ganho do motor de áudio num processo (razão saída/bruto) |
 | `open -n "$APP" --stderr /tmp/mt.log --args --model-test <bundle-id>` | Volume e mudo pelo `AppModel`, com mapeamento de processos real |

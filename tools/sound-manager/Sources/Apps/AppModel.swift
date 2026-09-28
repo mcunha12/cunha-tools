@@ -143,7 +143,7 @@ final class AppModel: ObservableObject {
         }
         let requests = apps.compactMap { app -> RouteRequest? in
             guard !app.audioProcessIDs.isEmpty, !settings[app.id].isDefault || lastPlayingAt[app.id] != nil else { return nil }
-            return RouteRequest(key: app.id, processObjectIDs: app.audioProcessIDs, gain: gain(for: app))
+            return RouteRequest(key: app.id, processObjectIDs: app.audioProcessIDs, gain: gain(for: app), keepsTap: !settings[app.id].isDefault)
         }
         router.apply(requests)
         if router.failures != failures { failures = router.failures }
