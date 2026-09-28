@@ -88,6 +88,20 @@ xattr -dr com.apple.quarantine "/Applications/Cunha Tools.app"
 4. Clique em **Carregar sem compactação** e escolha a pasta. Na janela de escolha, `Cmd+Shift+G` e `Cmd+V` colam o caminho.
 5. Recarregue as abas que já estavam abertas.
 
+### Atualizar
+
+Na janela do Cunha Tools, clique em **Checar atualizações**. O botão compara o commit que gerou o app aberto com o último commit do `main` no GitHub. Se o `main` estiver à frente, o Cunha Tools:
+
+1. Baixa o código daquele commit.
+2. Compila com o `scripts/build-suite.sh` do próprio código, só na arquitetura do Mac. Leva de 1 a 3 minutos.
+3. Atualiza as tools instaladas cuja versão ficou para trás e reabre as que estavam abertas.
+4. Troca o próprio app e reabre.
+
+- A atualização exige o Command Line Tools. Sem ele, o botão mostra o comando de instalação.
+- O build usa a identidade de assinatura local. Num Mac que instalou pelo DMG, a primeira atualização cria essa identidade, e o macOS pede de novo a permissão de áudio uma vez.
+- O log do último build fica em `~/Library/Logs/Cunha Tools/update.log`.
+- Uma tool só é trocada quando o `CFBundleVersion` dela sobe. Suba a versão a cada mudança numa tool.
+
 ### Distribuir em DMG
 
 ```sh
@@ -145,8 +159,9 @@ O resultado é `build/CunhaTools-<versão>.dmg`, com o atalho para Aplicativos e
 | `CunhaToolRequirements` | array | Permissões que a tool pede: `audioCapture`, `localNetwork` |
 | `CunhaToolSymbol` | string | SF Symbol do card |
 
-4. Na abertura, crie um `LaunchAtLogin`, chame `applyDefault()` nele e passe-o para `ToolControl.listen(launchAtLogin:openSetup:)`. Publique o estado de setup com `ToolStatus.publish(setupComplete:)`.
-5. Um script executável em `tools/<id>/build-hook.sh` roda antes da assinatura, com o caminho do `.app`. É opcional.
+4. Suba `CFBundleShortVersionString` e `CFBundleVersion` a cada mudança. O Checar atualizações só troca uma tool instalada com versão menor.
+5. Na abertura, crie um `LaunchAtLogin`, chame `applyDefault()` nele e passe-o para `ToolControl.listen(launchAtLogin:openSetup:)`. Publique o estado de setup com `ToolStatus.publish(setupComplete:)`.
+6. Um script executável em `tools/<id>/build-hook.sh` roda antes da assinatura, com o caminho do `.app`. É opcional.
 
 ## Testes
 
@@ -155,6 +170,7 @@ O Command Line Tools não executa XCTest nem swift-testing. Cada app traz autote
 | Comando | O que verifica |
 |---|---|
 | `CUNHA_INSTALL_DIR=<pasta> "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-install` | Catálogo, instalação, atualização e remoção numa pasta de teste |
+| `CUNHA_INSTALL_DIR=<pasta> [CUNHA_UPDATE_BRANCH=<branch>] "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-update` | Checar atualizações contra o GitHub real: decisão, download, build, commit gravado e troca da suíte numa pasta de teste. Leva de 1 a 3 minutos |
 | `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-ceiling` | Regras do teto e do ganho |
 | `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-slider` | Cliques e arraste no slider |
 | `open -n -W "build/Sound Manager.app" --stdout /tmp/rt.log --args --selftest-router` | Tempo de vida do tap num processo real |

@@ -33,11 +33,18 @@ struct MainView: View {
                 .frame(width: 44, height: 44)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Cunha Tools").font(.title2.weight(.semibold))
-                Text("Versão \(Bundle.main.shortVersion) · instala em \(InstallLocation.defaultDirectory.abbreviatedPath)")
+                Text(versionLine)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+            Spacer(minLength: 12)
+            UpdateBar()
         }
+    }
+
+    private var versionLine: String {
+        let commit = SuiteUpdater.installedCommit.map { " · commit \($0.prefix(7))" } ?? ""
+        return "Versão \(Bundle.main.shortVersion)\(commit) · instala em \(InstallLocation.defaultDirectory.abbreviatedPath)"
     }
 }
 

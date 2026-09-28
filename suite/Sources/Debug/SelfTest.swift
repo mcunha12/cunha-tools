@@ -1,11 +1,12 @@
 import AppKit
 import CunhaKit
 
-// Checks run inside the binary: --selftest-install. Exit code 1 on failure.
+// Checks run inside the binary: --selftest-install, --selftest-update. Exit code 1 on failure.
 enum SelfTest {
     static func runIfRequested() -> Bool {
         let arguments = CommandLine.arguments
         if arguments.contains("--selftest-install") { run(InstallSelfTest.run) }
+        if arguments.contains("--selftest-update") { run(UpdateSelfTest.run) }
         return false
     }
 

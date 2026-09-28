@@ -16,6 +16,7 @@ struct CunhaToolsApp: App {
         Window("Cunha Tools", id: "main") {
             MainView()
                 .environmentObject(delegate.tools)
+                .environmentObject(delegate.updater)
                 .frame(minWidth: 560, minHeight: 520)
         }
         .defaultSize(width: 600, height: 780)
@@ -27,6 +28,7 @@ struct CunhaToolsApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let tools = ToolsModel()
+    let updater = SuiteUpdater()
 
     // The suite is a manager, not a resident app: closing the window quits it.
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }

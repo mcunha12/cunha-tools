@@ -15,6 +15,7 @@ enum DebugRender {
             let tools = ToolsModel()
             let root = MainView(scrolls: false)
                 .environmentObject(tools)
+                .environmentObject(SuiteUpdater())
                 .frame(width: 600)
                 .background(Color(nsColor: .windowBackgroundColor))
             let hosting = NSHostingView(rootView: root)
