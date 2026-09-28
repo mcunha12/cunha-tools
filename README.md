@@ -93,7 +93,7 @@ xattr -dr com.apple.quarantine "/Applications/Cunha Tools.app"
 Na janela do Cunha Tools, clique em **Checar atualizações**. O botão compara o commit que gerou o app aberto com o último commit do `main` no GitHub. Se o `main` estiver à frente, o Cunha Tools:
 
 1. Baixa o código daquele commit.
-2. Compila com o `scripts/build-suite.sh` do próprio código, só na arquitetura do Mac. Leva de 1 a 3 minutos.
+2. Compila com o `scripts/build-suite.sh` do próprio código, só na arquitetura do Mac. Download e build levaram 303 s num MacBook Air com a máquina ocupada.
 3. Atualiza as tools instaladas cuja versão ficou para trás e reabre as que estavam abertas.
 4. Troca o próprio app e reabre.
 
@@ -170,7 +170,7 @@ O Command Line Tools não executa XCTest nem swift-testing. Cada app traz autote
 | Comando | O que verifica |
 |---|---|
 | `CUNHA_INSTALL_DIR=<pasta> "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-install` | Catálogo, instalação, atualização e remoção numa pasta de teste |
-| `CUNHA_INSTALL_DIR=<pasta> [CUNHA_UPDATE_BRANCH=<branch>] "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-update` | Checar atualizações contra o GitHub real: decisão, download, build, commit gravado e troca da suíte numa pasta de teste. Leva de 1 a 3 minutos |
+| `CUNHA_INSTALL_DIR=<pasta> [CUNHA_UPDATE_BRANCH=<branch>] "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-update` | Checar atualizações contra o GitHub real: decisão, download, build, commit gravado e troca da suíte numa pasta de teste. Leva até 5 minutos |
 | `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-ceiling` | Regras do teto e do ganho |
 | `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-slider` | Cliques e arraste no slider |
 | `open -n -W "build/Sound Manager.app" --stdout /tmp/rt.log --args --selftest-router` | Tempo de vida do tap num processo real |

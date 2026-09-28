@@ -1,6 +1,6 @@
 import Foundation
 
-// --selftest-update: real GitHub and a real build of CUNHA_UPDATE_BRANCH (or main), installed into CUNHA_INSTALL_DIR. Takes 1 to 3 minutes.
+// --selftest-update: real GitHub and a real build of CUNHA_UPDATE_BRANCH (or main), installed into CUNHA_INSTALL_DIR. Takes up to 5 minutes.
 @MainActor
 enum UpdateSelfTest {
     private static let rootCommit = "d8538955a8bc4b2e88181fe1fd0ec6cf2da064ab"

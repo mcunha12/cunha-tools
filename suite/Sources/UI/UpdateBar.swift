@@ -33,7 +33,7 @@ struct UpdateBar: View {
         case .checking: return "Consultando o GitHub…"
         case .upToDate: return "Atualizado com o \(branch)."
         case .downloading: return "Baixando o \(branch)…"
-        case .building: return "Compilando. Leva de 1 a 3 minutos."
+        case .building: return "Compilando. Leva até 5 minutos."
         case .installing: return "Instalando. O Cunha Tools reabre em seguida."
         case .failed(let message): return message
         }
