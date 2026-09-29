@@ -1,11 +1,11 @@
 import Foundation
 
-// A minimal tool bundle for --selftest-install; it is never opened.
+// A minimal unsigned bundle for the self-tests; it is never opened.
 enum FakeTool {
     static let bundleID = "com.marcelocunha.cunhatools.selftest"
     static let fileName = "Cunha Selftest.app"
 
-    static func make(in folder: URL, version: String, build: String) throws -> URL {
+    static func make(in folder: URL, version: String, build: String, bundleID: String = Self.bundleID) throws -> URL {
         let app = folder.appendingPathComponent(fileName, isDirectory: true)
         let contents = app.appendingPathComponent("Contents", isDirectory: true)
         let files = FileManager.default

@@ -2,67 +2,79 @@ import AppKit
 
 @MainActor
 final class SuiteUpdater: ObservableObject {
-    enum Decision: Equatable { case upToDate, update(String) }
-    enum Phase: Equatable { case idle, checking, upToDate, downloading, building, installing, failed(String) }
+    enum Decision: Equatable { case upToDate, update(version: String, dmg: URL) }
+    enum Phase: Equatable { case idle, checking, upToDate, downloading(String), installing, failed(String) }
 
     @Published private(set) var phase: Phase = .idle
     let source = UpdateSource.configured
 
     static var installedCommit: String? { Bundle.main.infoDictionary?["CunhaSourceCommit"] as? String }
 
-    var isBusy: Bool { [.checking, .downloading, .building, .installing].contains(phase) }
+    var isBusy: Bool {
+        switch phase {
+        case .checking, .downloading, .installing: true
+        case .idle, .upToDate, .failed: false
+        }
+    }
 
-    // One click checks and, when the branch has a newer commit, downloads, builds and installs it without asking again.
+    // --render-ui --update <fase> shows a phase without calling GitHub.
+    func showPreview(_ phase: Phase) { self.phase = phase }
+
+    // One click checks and, when GitHub has a newer release, downloads its DMG and installs it without asking again.
     func checkAndUpdate() {
         guard let source, !isBusy else { return }
         Task {
             do {
                 phase = .checking
-                let latest = try await source.latestCommit()
-                guard try await Self.decide(installed: Self.installedCommit, latest: latest, source: source) != .upToDate else {
+                let release = try await source.latestRelease()
+                guard case let .update(version, dmg) = try Self.decide(release, installed: Bundle.main.shortVersion) else {
                     phase = .upToDate
                     return
                 }
-                guard await UpdateBuilder.hasToolchain() else {
-                    throw InstallError(message: "A atualização compila o código e exige o Command Line Tools. No Terminal, rode xcode-select --install.")
-                }
-                phase = .downloading
-                let suite = try await Self.fetchAndBuild(latest, from: source) { self.phase = .building }
-                phase = .installing
-                try await Self.updateInstalledTools(from: suite)
+                phase = .downloading(version)
                 let destination = Self.suiteDestination
-                try await Self.replaceSuite(at: destination, with: suite)
+                try await Self.update(from: dmg, version: version, source: source, at: destination) { self.phase = .installing }
                 await Self.trashPreviousSuites(keeping: destination)
-                UpdateBuilder.cleanUp()
                 Self.relaunch(destination)
             } catch {
-                UpdateBuilder.cleanUp()
                 phase = .failed(error.localizedDescription)
             }
         }
     }
 
-    static func decide(installed: String?, latest: String, source: UpdateSource) async throws -> Decision {
-        guard let installed, !installed.isEmpty else { return .update(latest) }
-        if installed == latest { return .upToDate }
-        switch try await source.comparison(from: installed, to: latest) {
-        case .identical?, .behind?: return .upToDate
-        case .ahead?, .diverged?, nil: return .update(latest)
+    // A release that is not newer never replaces the running suite, with or without a DMG.
+    static func decide(_ release: Release, installed: String) throws -> Decision {
+        guard BundleVersion.compare(release.version, installed) == .orderedDescending else { return .upToDate }
+        guard let dmg = release.dmg else {
+            throw InstallError(message: "A versão \(release.version) do GitHub não tem o \(UpdateSource.assetName).")
         }
+        return .update(version: release.version, dmg: dmg)
     }
 
-    static func fetchAndBuild(_ commit: String, from source: UpdateSource, onBuild: @MainActor () -> Void) async throws -> URL {
-        let folder = UpdateBuilder.workFolder.appendingPathComponent(commit, isDirectory: true)
-        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-        let archive = folder.appendingPathComponent("source.tar.gz")
-        try await source.downloadSource(of: commit, to: archive)
-        let root = try await UpdateBuilder.extract(archive, into: folder.appendingPathComponent("source", isDirectory: true))
-        onBuild()
-        return try await UpdateBuilder.build(source: root, commit: commit)
+    // Installs the suite from the DMG, then the outdated tools; the download is gone afterwards, also on failure.
+    static func update(from dmg: URL, version: String, source: UpdateSource, at destination: URL, onInstall: () -> Void) async throws {
+        defer { UpdateImage.cleanUp() }
+        try FileManager.default.createDirectory(at: UpdateImage.workFolder, withIntermediateDirectories: true)
+        try await source.download(dmg, to: UpdateImage.downloadFile)
+        onInstall()
+        try await install(UpdateImage.downloadFile, version: version, at: destination)
+        try await updateInstalledTools(from: destination)
     }
 
-    // Only tools already installed and older than the new build are replaced; the open ones reopen.
-    static func updateInstalledTools(from suite: URL) async throws {
+    // The DMG is detached before this returns, also when the check or the copy fails.
+    private static func install(_ dmg: URL, version: String, at destination: URL) async throws {
+        let mount = try await UpdateImage.attach(dmg)
+        do {
+            try await replaceSuite(at: destination, with: try await UpdateImage.suite(in: mount, version: version))
+        } catch {
+            await UpdateImage.detach(mount)
+            throw error
+        }
+        await UpdateImage.detach(mount)
+    }
+
+    // Only tools already installed and older than the ones in the new suite are replaced; the open ones reopen.
+    private static func updateInstalledTools(from suite: URL) async throws {
         for tool in ToolCatalog.load(from: suite.appendingPathComponent("Contents/Library/Tools", isDirectory: true)) {
             guard let installed = InstallLocation.installedCopy(of: tool), installed.version < tool.version else { continue }
             let wasRunning = RunningTool.isRunning(tool.bundleID)
@@ -71,7 +83,7 @@ final class SuiteUpdater: ObservableObject {
         }
     }
 
-    static func replaceSuite(at destination: URL, with suite: URL) async throws {
+    private static func replaceSuite(at destination: URL, with suite: URL) async throws {
         try await Task.detached(priority: .userInitiated) {
             try ToolInstaller.replace(destination, with: suite)
             ToolInstaller.removeQuarantine(destination)

@@ -194,15 +194,12 @@ private struct UpdateCard: View {
         return false
     }
 
-    private var branch: String { updater.source?.branch ?? "main" }
-
     private var title: String {
         switch updater.phase {
         case .idle, .failed: return "Atualizar"
         case .checking: return "Consultando o GitHub"
         case .upToDate: return "Atualizado"
-        case .downloading: return "Baixando o \(branch)"
-        case .building: return "Compilando"
+        case let .downloading(version): return "Baixando a versão \(version)"
         case .installing: return "Instalando"
         }
     }
@@ -211,10 +208,9 @@ private struct UpdateCard: View {
         if updater.source == nil { return "Sem repositório configurado." }
         switch updater.phase {
         case .idle: return "Versão \(Bundle.main.shortVersion) · \(SuiteUpdater.installedCommit.map { String($0.prefix(7)) } ?? "build local")"
-        case .checking: return "Compara com o \(branch)."
-        case .upToDate: return "Igual ao \(branch) do GitHub."
-        case .downloading: return "Código do último commit."
-        case .building: return "Leva até 5 minutos."
+        case .checking: return "Procura uma versão nova."
+        case .upToDate: return "A versão \(Bundle.main.shortVersion) é a mais nova."
+        case .downloading: return "\(UpdateSource.assetName) do GitHub."
         case .installing: return "O Cunha Tools reabre em seguida."
         case let .failed(message): return message
         }
@@ -238,7 +234,7 @@ private struct UpdateCard: View {
 
     private var helpText: String {
         guard let source = updater.source else { return "Falta CunhaUpdateRepository no Info.plist." }
-        return "Baixa o \(source.branch) de github.com/\(source.repository), compila e troca o Cunha Tools e as tools instaladas."
+        return "Baixa a versão mais nova de github.com/\(source.repository)/releases e troca o Cunha Tools e as tools instaladas."
     }
 }
 

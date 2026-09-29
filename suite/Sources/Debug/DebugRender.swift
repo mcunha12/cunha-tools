@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-// --render-ui <png> [--page inicio|celular|<tool>] [--guide] [--contribute] [--phone] [--qr] [--light|--dark] [--width pt] [--wait s]: sidebar and page offscreen, without scroll or split view.
+// --render-ui <png> [--page inicio|celular|<tool>] [--guide] [--contribute] [--phone] [--qr] [--update <fase>] [--light|--dark] [--width pt] [--wait s]: sidebar and page offscreen, without scroll or split view.
 enum DebugRender {
     static func runIfRequested() -> Bool {
         let arguments = CommandLine.arguments
@@ -19,6 +19,8 @@ enum DebugRender {
             // A connected phone would replace the QR, so --qr leaves the device tracker off.
             if showsPhone && !arguments.contains("--qr") { phone.start() }
             if arguments.contains("--qr") { phone.showPairingPreview(.random()) }
+            let updater = SuiteUpdater()
+            if let name = value(after: "--update", in: arguments) { updater.showPreview(updatePhase(named: name)) }
             let page = page(named: value(after: "--page", in: arguments), in: tools)
             let layout = HStack(alignment: .top, spacing: 0) {
                 Sidebar(page: .constant(page), showsPhone: showsPhone)
@@ -35,7 +37,7 @@ enum DebugRender {
                 .tint(Palette.accent)
                 .environmentObject(tools)
                 .environmentObject(phone)
-                .environmentObject(SuiteUpdater())
+                .environmentObject(updater)
             let hosting = NSHostingView(rootView: root)
             let window = NSWindow(contentRect: NSRect(x: -20000, y: -20000, width: 1080, height: 900), styleMask: [.borderless], backing: .buffered, defer: false)
             if arguments.contains("--dark") { window.appearance = NSAppearance(named: .darkAqua) }
@@ -64,6 +66,17 @@ enum DebugRender {
         case let name?:
             let match = tools.entries.first { $0.tool.name.lowercased() == name || $0.id == name }
             return match.map { .tool($0.id) } ?? .overview
+        }
+    }
+
+    private static func updatePhase(named name: String) -> SuiteUpdater.Phase {
+        switch name {
+        case "consultando": .checking
+        case "baixando": .downloading("0.4.0")
+        case "instalando": .installing
+        case "atualizado": .upToDate
+        case "falha": .failed(UpdateSource.noReleaseMessage)
+        default: .idle
         }
     }
 
