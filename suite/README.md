@@ -21,6 +21,7 @@ App com janela única. Instala, atualiza, remove e configura as tools embutidas,
 1. **Ferramentas Android**: sem adb, a suíte baixa o platform-tools do Google (16 MB) para `~/Library/Application Support/Cunha Tools/platform-tools`.
 2. **Preparar o celular**: desligar o Bloqueador automático (Samsung), ativar as Opções do desenvolvedor e ligar a Depuração sem fio.
 3. **Parear**: no celular, Depuração sem fio → "Parear o dispositivo com um código QR" e ler o QR da suíte. Alternativa: "Parear com código", com IP:porta e o código de 6 dígitos. Também aceita USB.
+   Se o Mac não vê o serviço de pareamento do QR em 20 s, a suíte mostra um aviso laranja e abre "Parear com código". A busca pelo QR continua.
 4. **App companheiro**: a suíte instala o APK embutido e concede `WRITE_SECURE_SETTINGS` e `POST_NOTIFICATIONS`.
 
 ## Atualizar
@@ -44,4 +45,4 @@ App com janela única. Instala, atualiza, remove e configura as tools embutidas,
 | `CunhaTools --selftest-phone` | QR de pareamento e leitura das respostas do adb |
 | `CunhaTools --selftest-bonjour` | Busca e resolução mDNS de um serviço de pareamento falso |
 | `CunhaTools --selftest-platform-tools <pasta>` | Download e extração do platform-tools |
-| `CunhaTools --render-ui <saída.png> [--page inicio\|celular\|<tool>] [--guide] [--contribute] [--phone] [--qr] [--light\|--dark] [--width <pt>]` | Barra lateral e página renderizadas em PNG, sem split view. `--contribute` renderiza só o popup do Pix. `--width` define a largura da página, padrão 830 |
+| `CunhaTools --render-ui <saída.png> [--page inicio\|celular\|<tool>] [--guide] [--contribute] [--phone] [--qr] [--light\|--dark] [--width <pt>] [--wait s]` | Barra lateral e página renderizadas em PNG, sem split view. `--contribute` renderiza só o popup do Pix. `--width` define a largura da página, padrão 830. `--qr` mostra o QR sem ler os celulares conectados; `--qr --wait 21` mostra o aviso de 20 s |

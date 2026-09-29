@@ -20,6 +20,7 @@ final class PhoneModel: ObservableObject {
     @Published private(set) var companionVersion: String?
     @Published private(set) var pairing = Pairing.idle
     @Published private(set) var pairingMessage: String?
+    @Published private(set) var phoneNotSeen = false
     @Published private(set) var companionBusy = false
     @Published private(set) var companionError: String?
     @Published var manualPairAddress = ""
@@ -30,6 +31,7 @@ final class PhoneModel: ObservableObject {
     private lazy var tracker = DeviceTracker { [weak self] in self?.devicesChanged($0) }
     private var pairFinder: BonjourFinder?
     private var connectFinder: BonjourFinder?
+    private var scanHint: Task<Void, Never>?
     private var connectHint: Task<Void, Never>?
     private var activation: NSObjectProtocol?
 
@@ -100,7 +102,7 @@ final class PhoneModel: ObservableObject {
     func startQRPairing() {
         stopPairing()
         let session = PairingSession.random()
-        pairing = .waitingForScan(session)
+        waitForScan(session)
         pairFinder = finder(Self.pairingType) { [weak self] name, address in
             guard name == session.name else { return }
             self?.pair(address: address, code: session.password)
@@ -120,13 +122,25 @@ final class PhoneModel: ObservableObject {
         connectFinder?.stop()
         pairFinder = nil
         connectFinder = nil
+        scanHint?.cancel()
         connectHint?.cancel()
         pairing = .idle
         pairingMessage = nil
+        phoneNotSeen = false
     }
 
-    // Used by the offscreen render only: shows a QR without browsing the network.
-    func showPairingPreview(_ session: PairingSession) { pairing = .waitingForScan(session) }
+    // Used by the offscreen render only: shows a QR and runs the scan timer without browsing the network.
+    func showPairingPreview(_ session: PairingSession) { waitForScan(session) }
+
+    // After 20 s without the phone's advert the Wi-Fi hint shows; the browser keeps looking.
+    private func waitForScan(_ session: PairingSession) {
+        pairing = .waitingForScan(session)
+        scanHint = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(20))
+            guard !Task.isCancelled, let self, self.pairing == .waitingForScan(session) else { return }
+            self.phoneNotSeen = true
+        }
+    }
 
     private func devicesChanged(_ list: [ADBDevice]) {
         let previous = device?.serial
@@ -141,6 +155,7 @@ final class PhoneModel: ObservableObject {
         pairFinder = nil
         pairing = .pairing
         pairingMessage = nil
+        phoneNotSeen = false
         Task {
             do {
                 let result = try await ADB.run(["pair", address, code], timeout: 30)
