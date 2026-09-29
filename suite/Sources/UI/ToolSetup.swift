@@ -93,7 +93,7 @@ private struct MenuBarIconRow: View {
     }
 
     private var detail: String {
-        if remote.state == nil { return "Abra o Sound Manager para mudar." }
+        if remote.state == nil { return remote.isUnresponsive ? "Atualize o Sound Manager para mudar." : "Abra o Sound Manager para mudar." }
         return remote.showsMenuBarIcon ? "O ícone de onda sonora verde abre o menu de volumes." : "Oculto. Abrir o Sound Manager de novo mostra o ícone."
     }
 }
