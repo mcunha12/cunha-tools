@@ -21,7 +21,7 @@ Pair File Sharing e Pair Screen usam o app Android companheiro, em `android/`. O
 
 ## Sound Manager
 
-O ícone de alto-falante fica na barra de menus. O clique abre o volume geral do Mac e a lista dos apps que estão tocando som.
+O ícone de onda sonora verde fica na barra de menus. O clique abre o volume geral do Mac e a lista dos apps que estão tocando som.
 
 <img src="docs/sound-manager.png" alt="Menu do Sound Manager com volume geral e três apps" width="360">
 

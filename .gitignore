@@ -6,3 +6,4 @@ build/
 __pycache__/
 android/build/
 *.keystore
+.claude/worktrees/

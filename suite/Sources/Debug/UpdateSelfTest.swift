@@ -5,6 +5,12 @@ import Foundation
 enum UpdateSelfTest {
     private static let rootCommit = "d8538955a8bc4b2e88181fe1fd0ec6cf2da064ab"
 
+    // Same SDK lookup as android/build.sh.
+    private static var hasAndroidSDK: Bool {
+        let sdk = ProcessInfo.processInfo.environment["ANDROID_HOME"] ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Android/sdk").path
+        return FileManager.default.fileExists(atPath: "\(sdk)/build-tools/35.0.0/aapt2")
+    }
+
     static func run(_ checker: Checker) async {
         guard let installDir = InstallLocation.override else { return checker.fail("CUNHA_INSTALL_DIR definido") }
         guard let source = UpdateSource.configured else { return checker.fail("CunhaUpdateRepository no Info.plist") }
@@ -25,6 +31,11 @@ enum UpdateSelfTest {
             checker.check(built?["CunhaSourceCommit"] as? String == latest, "build grava o commit no Info.plist")
             checker.check(await UpdateBuilder.isValidlySigned(suite), "suíte nova com assinatura válida")
             checker.check(!ToolCatalog.load(from: suite.appendingPathComponent("Contents/Library/Tools")).isEmpty, "suíte nova traz as tools embutidas")
+            if hasAndroidSDK {
+                checker.check(FileManager.default.fileExists(atPath: suite.appendingPathComponent("Contents/Resources/Android/cunha-companion.apk").path), "suíte nova traz o APK do app companheiro")
+            } else {
+                SelfTest.log("sem Android SDK: APK não conferido")
+            }
 
             let destination = installDir.appendingPathComponent("Cunha Tools.app", isDirectory: true)
             try? FileManager.default.removeItem(at: destination)

@@ -31,8 +31,9 @@ fi
   --min-sdk-version 30 --target-sdk-version 35 --version-code 1 --version-name 0.1.0 \
   --java "$WORK/gen" -o "$WORK/base.apk" "$WORK/res.zip"
 
-javac -source 8 -target 8 -bootclasspath "$PLATFORM:$TOOLS/core-lambda-stubs.jar" -Xlint:all -Xlint:-options -encoding UTF-8 -d "$WORK/classes" \
-  $(find "$HERE/core/src" "$HERE/app/src" "$WORK/gen" -name '*.java')
+# One array item per line, so a path with spaces (the updater's ~/Library/Caches/Cunha Tools) stays whole.
+SOURCES=("${(@f)$(find "$HERE/core/src" "$HERE/app/src" "$WORK/gen" -name '*.java')}")
+javac -source 8 -target 8 -bootclasspath "$PLATFORM:$TOOLS/core-lambda-stubs.jar" -Xlint:all -Xlint:-options -encoding UTF-8 -d "$WORK/classes" $SOURCES
 jar cf "$WORK/classes.jar" -C "$WORK/classes" .
 "$TOOLS/d8" --release --min-api 30 --lib "$PLATFORM" --output "$WORK/dex" "$WORK/classes.jar"
 
