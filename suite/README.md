@@ -7,7 +7,7 @@ App com janela única. Instala, atualiza, remove e configura as tools embutidas,
 - Barra lateral: Início, uma página por tool e Celular. O ponto ao lado de cada tool mostra o estado: laranja para atualização ou configuração pendente, verde-azulado para aberta, cinza para não instalada.
 - Início: selo de estado, card com a próxima ação, anel de tools abertas, fechadas e não instaladas, e grade com um card por tool.
 - Página da tool: instalar, atualizar, abrir e remover. Aba **Configuração**: requisitos, "Configurar" e "Abrir ao iniciar o Mac". Aba **Guia**: passos de `CunhaToolGuide`. A página abre no Guia quando a tool está instalada e configurada.
-- Rodapé: **Atualizar**, **Contribua** (popup com a chave Pix e o botão de copiar) e **Aparência**, gravada em `UserDefaults`.
+- Rodapé: **Atualizar**, **Contribua** (popup com o QR Pix e o código copia e cola) e **Aparência**, gravada em `UserDefaults`.
 
 ## Tools
 
