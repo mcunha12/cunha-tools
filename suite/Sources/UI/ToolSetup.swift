@@ -7,6 +7,7 @@ struct ToolSetup: View {
     @EnvironmentObject private var phone: PhoneModel
     let entry: ToolsModel.Entry
     @Binding var page: Page
+    var remote: SoundManagerRemote?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -18,7 +19,11 @@ struct ToolSetup: View {
                 row(requirement)
             }
             if entry.installed != nil {
-                if !entry.tool.requirements.isEmpty { Divider() }
+                if let remote {
+                    if !entry.tool.requirements.isEmpty { Divider() }
+                    MenuBarIconRow(remote: remote)
+                }
+                if !entry.tool.requirements.isEmpty || remote != nil { Divider() }
                 loginRow
             }
             if entry.installed != nil, let detail = entry.status?.detail, !detail.isEmpty { Hint(text: detail) }
@@ -71,6 +76,25 @@ struct ToolSetup: View {
         case false?: return ("exclamationmark.circle.fill", .orange, "Pendente. Clique em Configurar para a tool pedir de novo.")
         case nil: return ("circle.dashed", .secondary, "Abra a tool para conferir.")
         }
+    }
+}
+
+// Sound Manager's menu bar icon, switched over SoundChannel; the tool must be open to apply it.
+private struct MenuBarIconRow: View {
+    @ObservedObject var remote: SoundManagerRemote
+
+    var body: some View {
+        SetupRow(symbol: "menubar.rectangle", tint: Palette.accent, title: "Mostrar na barra de menus", detail: detail) {
+            Toggle("Mostrar na barra de menus", isOn: Binding(get: { remote.showsMenuBarIcon }, set: remote.setMenuBarIcon(visible:)))
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .disabled(remote.state == nil)
+        }
+    }
+
+    private var detail: String {
+        if remote.state == nil { return "Abra o Sound Manager para mudar." }
+        return remote.showsMenuBarIcon ? "O ícone de onda sonora verde abre o menu de volumes." : "Oculto. Abrir o Sound Manager de novo mostra o ícone."
     }
 }
 

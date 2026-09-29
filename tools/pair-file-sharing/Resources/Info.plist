@@ -24,11 +24,9 @@
 	<string>1</string>
 	<key>CunhaToolGuide</key>
 	<array>
-		<string>Na página Celular, pareie o celular e instale o app companheiro.</string>
-		<string>Clique no ícone da tool na barra de menus e escolha Parear celular. Com o adb conectado, o pareamento é automático. Sem adb, a janela mostra um QR para a câmera do celular.</string>
-		<string>Mac para celular: arraste arquivos ou pastas para o ícone da barra de menus. Também funciona por Escolher arquivos… e por Finder → Serviços → Enviar para o celular.</string>
-		<string>Celular para Mac: Compartilhar → Enviar para o Mac. Os arquivos chegam em ~/Downloads/Pair File Sharing.</string>
-		<string>O Mac e o celular precisam estar na mesma rede Wi-Fi.</string>
+		<string>Pareie o celular na página Celular. Depois, no menu da tool, clique em Parear celular. O Mac e o celular ficam na mesma rede Wi-Fi.</string>
+		<string>Mac → celular: arraste arquivos ou pastas para o ícone da tool na barra de menus.</string>
+		<string>Celular → Mac: Compartilhar → Enviar para o Mac. Os arquivos chegam em ~/Downloads/Pair File Sharing.</string>
 	</array>
 	<key>CunhaToolRequirements</key>
 	<array>

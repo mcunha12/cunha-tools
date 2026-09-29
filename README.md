@@ -16,12 +16,13 @@ Pair File Sharing e Pair Screen usam o app Android companheiro, em `android/`. O
 
 - A barra lateral lista a página Início, uma página por tool e a página Celular.
 - A página Início mostra o que falta instalar, atualizar ou configurar. O botão principal resolve o primeiro item.
-- A página de cada tool tem duas abas. **Configuração**: permissões, celular e abertura no login. **Guia**: os passos de uso.
+- A página de cada tool tem instalar, atualizar, abrir e remover, as permissões, o celular e a abertura no login. **Como usar**, fechado no fim da página, lista os passos de uso.
+- A página do Sound Manager também muda o volume geral e o de cada app, e mostra ou esconde o ícone na barra de menus.
 - O rodapé da barra lateral tem **Atualizar**, **Contribua** (QR Pix e código copia e cola) e **Aparência** (Sistema, Claro ou Escuro).
 
 ## Sound Manager
 
-O ícone de onda sonora verde fica na barra de menus. O clique abre o volume geral do Mac e a lista dos apps que estão tocando som.
+O ícone de onda sonora verde fica na barra de menus. O clique abre o volume geral do Mac e a lista dos apps que estão tocando som. A página Sound Manager do Cunha Tools mostra os mesmos controles, menos o volume por aba.
 
 <img src="docs/sound-manager.png" alt="Menu do Sound Manager com volume geral e três apps" width="360">
 
@@ -31,6 +32,7 @@ O ícone de onda sonora verde fica na barra de menus. O clique abre o volume ger
 | Volume por app | Slider e mudo para cada app que toca som. O app guarda o valor de cada app entre aberturas |
 | Volume por aba | No Chrome e em navegadores Chromium, slider e mudo para cada aba. Exige a extensão incluída no app |
 | Abrir ao iniciar o Mac | Liga ou desliga a abertura automática no login |
+| Mostrar na barra de menus | Na página do Sound Manager, no Cunha Tools. Oculto, o Sound Manager continua aberto. Abrir o app de novo, com ele já aberto, mostra o ícone |
 
 ### O volume geral é o teto
 
@@ -173,7 +175,7 @@ O resultado é `build/CunhaTools-<versão>.dmg`, com o atalho para Aplicativos e
 | `tools/pair-file-sharing/` | Pair File Sharing: código, protocolo e teste de interoperabilidade com o Android |
 | `tools/pair-screen/` | Pair Screen: cliente scrcpy nativo. O `build-hook.sh` baixa o `scrcpy-server` e confere o SHA-256 |
 | `android/` | App companheiro Android, Java sem Gradle |
-| `shared/CunhaKit/` | Código comum: item de início, comandos gerenciador → tool, estado da tool, cliente adb |
+| `shared/CunhaKit/` | Código comum: item de início, comandos gerenciador → tool, estado da tool, canal gerenciador ↔ Sound Manager, slider com teto, cliente adb |
 | `scripts/` | Build, instalação, assinatura, ícone e DMG |
 | `dist/` | Guia de instalação que vai no DMG e o APK pronto do app companheiro |
 | `docs/` | Imagens deste README |
@@ -208,7 +210,7 @@ O resultado é `build/CunhaTools-<versão>.dmg`, com o atalho para Aplicativos e
 | `CunhaToolRequirements` | array | O que a tool precisa: `audioCapture`, `localNetwork`, `phone` |
 | `CunhaToolSymbol` | string | SF Symbol do ícone na barra lateral e no card |
 | `CunhaToolTint` | string | Cor do ícone, em `#RRGGBB` |
-| `CunhaToolGuide` | array | Passos da aba Guia, um texto por passo |
+| `CunhaToolGuide` | array | Passos de **Como usar**, no máximo 3, um texto por passo |
 
 4. Suba `CFBundleShortVersionString` e `CFBundleVersion` a cada mudança no código. O Atualizar só troca uma tool instalada com versão menor.
 5. Na abertura, crie um `LaunchAtLogin`, chame `applyDefault()` nele e passe-o para `ToolControl.listen(launchAtLogin:openSetup:)`. Publique o estado de setup com `ToolStatus.publish(setupComplete:)`.
@@ -223,6 +225,7 @@ O Command Line Tools não executa XCTest nem swift-testing. Cada app traz autote
 | `CUNHA_INSTALL_DIR=<pasta> "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-install` | Catálogo, instalação, atualização e remoção numa pasta de teste |
 | `CUNHA_INSTALL_DIR=<pasta> [CUNHA_UPDATE_BRANCH=<branch>] "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-update` | Atualizar contra o GitHub real: decisão, download, build, commit gravado e troca da suíte numa pasta de teste. Leva até 5 minutos |
 | `"build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-phone` | QR de pareamento e leitura das respostas do adb |
+| `"build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-remote` | Canal com o Sound Manager aberto: volume geral, mudo, volume por app, ícone na barra de menus, mensagens inválidas, fechar e abrir. Altera o volume real do Mac e restaura no fim |
 | `"build/Cunha Tools.app/Contents/MacOS/CunhaTools" --render-ui <saída.png> [--page inicio\|celular\|<tool>] [--guide] [--contribute] [--dark]` | Barra lateral e página renderizadas em PNG |
 | `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-ceiling` | Regras do teto e do ganho |
 | `"build/Sound Manager.app/Contents/MacOS/SoundManager" --selftest-slider` | Cliques e arraste no slider |

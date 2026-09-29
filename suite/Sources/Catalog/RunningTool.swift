@@ -9,6 +9,13 @@ enum RunningTool {
 
     static func isRunning(_ bundleID: String) -> Bool { !instances(of: bundleID).isEmpty }
 
+    // Launch and terminate notifications skip agent apps, and every tool is one; the running list reports them.
+    static func observeRunningApps(_ handler: @escaping @MainActor () -> Void) -> NSKeyValueObservation {
+        NSWorkspace.shared.observe(\.runningApplications) { _, _ in
+            DispatchQueue.main.async { MainActor.assumeIsolated(handler) }
+        }
+    }
+
     // Polite quit over ToolControl first, then terminate, then force.
     static func quit(bundleID: String) async {
         guard isRunning(bundleID) else { return }

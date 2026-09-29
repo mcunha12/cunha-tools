@@ -1,13 +1,14 @@
 import AppKit
 import CunhaKit
 
-// Checks run inside the binary: --selftest-install, --selftest-update, --selftest-phone, --selftest-bonjour, --selftest-platform-tools <dir>. Exit code 1 on failure.
+// Checks run inside the binary: --selftest-install, --selftest-update, --selftest-phone, --selftest-bonjour, --selftest-remote, --selftest-platform-tools <dir>. Exit code 1 on failure.
 enum SelfTest {
     static func runIfRequested() -> Bool {
         let arguments = CommandLine.arguments
         if arguments.contains("--selftest-install") { run(InstallSelfTest.run) }
         if arguments.contains("--selftest-update") { run(UpdateSelfTest.run) }
         if arguments.contains("--selftest-phone") { run(PhoneSelfTest.run) }
+        if arguments.contains("--selftest-remote") { run(RemoteSelfTest.run) }
         if arguments.contains("--selftest-bonjour") { run(PhoneSelfTest.bonjour) }
         if let index = arguments.firstIndex(of: "--selftest-platform-tools"), arguments.count > index + 1 {
             let folder = URL(fileURLWithPath: arguments[index + 1], isDirectory: true)

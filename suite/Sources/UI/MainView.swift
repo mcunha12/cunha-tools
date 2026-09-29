@@ -52,8 +52,6 @@ struct PageContent: View {
 }
 
 extension ToolsModel.Entry {
-    var needsSetup: Bool { installed == nil || status?.setupComplete == false }
-
     // One status per tool, shared by the sidebar, the tiles and the tool page.
     var state: (text: String, symbol: String, color: Color) {
         switch phase {
