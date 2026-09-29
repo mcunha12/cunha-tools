@@ -5,7 +5,7 @@ App com janela única. Instala, atualiza, remove e configura as tools embutidas,
 ## Janela
 
 - Barra lateral: Início, uma página por tool e Celular. O ponto ao lado de cada tool mostra o estado: laranja para atualização ou configuração pendente, verde-azulado para aberta, cinza para não instalada.
-- Início: selo de estado, card com a próxima ação, anel de tools abertas, fechadas e não instaladas, e grade com um card por tool.
+- Início: selo de estado e lista das tools e do Celular. O botão de cada linha (Instalar, Atualizar, Configurar ou Parear) abre a página dela.
 - Página da tool, de cima para baixo: card de instalar, atualizar, abrir e remover. Card de configuração: requisitos, "Configurar" e "Abrir ao iniciar o Mac". **Como usar**, fechado: passos de `CunhaToolGuide`.
 - Página do Sound Manager: card **Volumes** entre os dois primeiros e "Mostrar na barra de menus" no card de configuração. Detalhes em [Sound Manager](#sound-manager).
 - Rodapé: **Atualizar**, **Contribua** (popup com o QR Pix e o código copia e cola) e **Aparência**, gravada em `UserDefaults`.

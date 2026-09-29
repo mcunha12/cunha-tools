@@ -6,7 +6,6 @@ enum Palette {
     static let card = Color(nsColor: .controlBackgroundColor)
     static let canvas = Color(nsColor: .windowBackgroundColor)
     static let closed = Color(hex: 0x5BA8C9)
-    static let track = Color.secondary.opacity(0.35)
 }
 
 extension Color {

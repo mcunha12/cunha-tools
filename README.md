@@ -15,7 +15,7 @@ Pair File Sharing e Pair Screen usam o app Android companheiro, em `android/`. O
 ## Gerenciador
 
 - A barra lateral lista a página Início, uma página por tool e a página Celular.
-- A página Início mostra o que falta instalar, atualizar ou configurar. O botão principal resolve o primeiro item.
+- A página Início lista as tools e o Celular com o estado de cada um. O botão da linha abre a página correspondente.
 - A página de cada tool tem instalar, atualizar, abrir e remover, as permissões, o celular e a abertura no login. **Como usar**, fechado no fim da página, lista os passos de uso.
 - A página do Sound Manager também muda o volume geral e o de cada app, e mostra ou esconde o ícone na barra de menus.
 - O rodapé da barra lateral tem **Atualizar**, **Contribua** (QR Pix e código copia e cola) e **Aparência** (Sistema, Claro ou Escuro).
@@ -96,7 +96,7 @@ cd cunha-tools
 open "build/Cunha Tools.app"
 ```
 
-Na página Início do Cunha Tools, clique em **Instalar tudo**. As tools vão para `/Applications` e abrem. A página de cada tool também tem **Instalar**.
+Na página Início do Cunha Tools, clique em **Instalar** na linha da tool e depois em **Instalar** na página dela. A tool vai para `/Applications` e abre.
 
 Para instalar só o Sound Manager, sem o gerenciador: `./scripts/install.sh tools/sound-manager`.
 
@@ -206,9 +206,9 @@ O resultado é `build/CunhaTools-<versão>.dmg`, com o atalho para Aplicativos e
 
 | Chave | Tipo | Uso |
 |---|---|---|
-| `CunhaToolSummary` | string | Frase do card |
+| `CunhaToolSummary` | string | Subtítulo da página da tool |
 | `CunhaToolRequirements` | array | O que a tool precisa: `audioCapture`, `localNetwork`, `phone` |
-| `CunhaToolSymbol` | string | SF Symbol do ícone na barra lateral e no card |
+| `CunhaToolSymbol` | string | SF Symbol do ícone na barra lateral e no Início |
 | `CunhaToolTint` | string | Cor do ícone, em `#RRGGBB` |
 | `CunhaToolGuide` | array | Passos de **Como usar**, no máximo 3, um texto por passo |
 

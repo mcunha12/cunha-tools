@@ -69,10 +69,6 @@ final class ToolsModel: ObservableObject {
 
     var pending: [Entry] { entries.filter { $0.phase != .installed } }
 
-    func installPending() {
-        pending.forEach(install)
-    }
-
     func remove(_ entry: Entry) {
         guard let copy = entry.installed else { return }
         perform(entry, label: "Removendo…") {
