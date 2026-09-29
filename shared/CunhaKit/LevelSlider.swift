@@ -1,11 +1,11 @@
 import SwiftUI
 
 // Slider 0...1 that stops at the ceiling; the track above the ceiling is dimmed.
-struct LevelSlider: View {
+public struct LevelSlider: View {
     private enum Press { case knob(offset: CGFloat), track }
 
     let value: Double
-    var ceiling: Double = 1
+    let ceiling: Double
     let onChange: (Double) -> Void
     @Environment(\.isEnabled) private var isEnabled
     @State private var press: Press?
@@ -14,7 +14,13 @@ struct LevelSlider: View {
     private let trackHeight: CGFloat = 4
     private let step = 0.05
 
-    var body: some View {
+    public init(value: Double, ceiling: Double = 1, onChange: @escaping (Double) -> Void) {
+        self.value = value
+        self.ceiling = ceiling
+        self.onChange = onChange
+    }
+
+    public var body: some View {
         GeometryReader { geometry in
             let width = geometry.size.width
             let travel = max(width - knobSize, 1)

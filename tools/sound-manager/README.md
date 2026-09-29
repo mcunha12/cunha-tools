@@ -2,6 +2,8 @@
 
 App de barra de menus do macOS. O clique no ícone mostra o volume geral do Mac e lista os apps tocando som, com volume e mudo por app. O Chrome expande e mostra volume e mudo por aba.
 
+A página Sound Manager do Cunha Tools muda o volume geral e o de cada app, e mostra ou esconde o ícone. O volume por aba fica só no menu.
+
 ## Requisitos
 
 - macOS 15 ou superior (process taps do Core Audio).
@@ -39,6 +41,27 @@ Dispositivo com volume próprio (ex.: alto-falantes do Mac): o tap aplica a raz�
 
 Dispositivo sem volume próprio (HDMI, alguns DACs): o geral funciona por software, e a legenda mostra “por software”. Com o geral abaixo de 100%, todo app tocando som passa pelo tap, com ganho igual ao volume efetivo. O app guarda o geral por software por dispositivo (UID).
 
+## Canal com o Cunha Tools
+
+O canal é `SoundChannel`, em `shared/CunhaKit/SoundChannel.swift`: distributed notifications locais, com o conteúdo numa string JSON. Só o app aberto escuta; `--render-ui` e os autotestes não.
+
+| Notificação | Sentido | Conteúdo |
+|---|---|---|
+| `com.marcelocunha.soundmanager.state` | app → suíte | Estado inteiro: dispositivo de saída, volume geral, mudo, apps tocando som (volume salvo, volume efetivo, mudo) e ícone na barra de menus |
+| `com.marcelocunha.soundmanager.action` | suíte → app | Uma ação: volume ou mudo do geral, volume ou mudo de um app, ícone visível ou oculto, pedido de estado |
+
+- O app publica o estado 30 ms depois de uma mudança, só se ele difere do último publicado. Um pedido de estado tem resposta na hora.
+- A lista de apps é a mesma do menu.
+- As ações seguem as regras do menu. Um app arrastado acima do volume geral fica no volume geral.
+- O app ignora mensagem com JSON inválido.
+- Qualquer processo do usuário pode postar no canal, como no `ToolControl`.
+
+## Ícone na barra de menus
+
+- "Mostrar na barra de menus", na página do Cunha Tools, mostra ou esconde o ícone. O valor fica em `UserDefaults`, chave `showsMenuBarIcon`. O padrão é visível.
+- Com o ícone oculto, o app continua aberto e aplica os volumes.
+- Para o ícone voltar: abra o Sound Manager de novo com ele já aberto, por clique duplo no Finder ou `open`. Com o app fechado, a primeira abertura mantém o ícone oculto e a segunda mostra.
+
 ## Extensão do navegador (volume por aba)
 
 1. Abra o menu do Sound Manager e expanda o Chrome.
@@ -74,3 +97,5 @@ Depois de alterar arquivos em `Resources/BrowserExtension/`, clique de novo em �
 | `python3 tools/sound-manager/scripts/fake_extension.py session 6` | Ponte WebSocket do app com um cliente falso |
 
 `e2e_extension.py` usa a porta 47899 e não interfere no app aberto. `fake_extension.py` usa a porta 47821, ou `SOUNDMANAGER_PORT`.
+
+O canal com o Cunha Tools é testado pela suíte, com este app aberto: `"build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-remote`. A lista de verificações está em [`suite/README.md`](../../suite/README.md#verificação).

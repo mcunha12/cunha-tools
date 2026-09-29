@@ -23,7 +23,7 @@ struct MenuContentView: View {
             }
             ScrollView {
                 VStack(spacing: 2) {
-                    let apps = visibleApps
+                    let apps = model.visibleApps(bridge: bridge)
                     if apps.isEmpty {
                         Text("Nenhum app tocando som agora.")
                             .font(.callout)
@@ -75,14 +75,6 @@ struct MenuContentView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-    }
-
-    private var visibleApps: [AppItem] {
-        let audible = Set(model.audibleApps.map(\.id))
-        return model.apps.filter { app in
-            let sessions = BrowserCatalog.isExtensionBrowser(app.bundleID) ? bridge.sessions(matchingAppNamed: app.name, bundleID: app.bundleID) : []
-            return sessions.isEmpty ? audible.contains(app.id) : !bridge.tabsWithSound(in: sessions).isEmpty
-        }
     }
 
     private func expansion(for app: AppItem) -> Binding<Bool> {
