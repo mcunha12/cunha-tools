@@ -52,7 +52,7 @@ struct PageContent: View {
 }
 
 extension ToolsModel.Entry {
-    // One status per tool, shared by the sidebar, the tiles and the tool page.
+    // One status per tool, shared by the sidebar, Início and the tool page.
     var state: (text: String, symbol: String, color: Color) {
         switch phase {
         case .notInstalled: return ("Não instalada", "arrow.down.circle", .secondary)
