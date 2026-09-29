@@ -39,24 +39,27 @@ A página conversa com o Sound Manager aberto por `SoundChannel` (`shared/CunhaK
 
 ## Atualizar
 
-- O `build-suite.sh` grava `CunhaSourceCommit` no `Info.plist` da suíte: `CUNHA_SOURCE_COMMIT` ou `git rev-parse HEAD`.
-- O botão lê `CunhaUpdateRepository` e `CunhaUpdateBranch` do `Info.plist`. `CUNHA_UPDATE_BRANCH` troca o branch para testes.
-- Decisão, pela API de compare do GitHub: commit igual ou branch atrás do commit instalado → atualizado. Branch à frente, divergente, commit desconhecido pelo GitHub ou sem commit gravado → atualiza.
-- A atualização baixa o tarball do commit para `~/Library/Caches/Cunha Tools/update`, roda o `build-suite.sh` com `ARCHS` nativo, troca as tools instaladas mais antigas e a própria suíte, e apaga a pasta. Log em `~/Library/Logs/Cunha Tools/update.log`.
-- A suíte nova vai para a pasta de instalação, de onde quer que a cópia aberta esteja. Depois, as outras cópias da suíte nessa pasta e a cópia aberta vão para o Lixo. Uma cópia num DMG ou em App Translocation fica onde está.
+- O botão lê `CunhaUpdateRepository` do `Info.plist` e consulta `releases/latest` na API do GitHub, sem token: 60 consultas por hora por IP. Rascunhos e pré-releases ficam de fora.
+- Decisão: a tag da release sem o `v`, comparada com o `CFBundleShortVersionString` da suíte aberta. Maior → atualiza. Igual ou menor → atualizado.
+- Sem release publicada, ou com uma versão maior sem o asset `CunhaTools.dmg`, o botão mostra o erro.
+- A atualização baixa o `CunhaTools.dmg` para `~/Library/Caches/Cunha Tools/update` e o monta com `hdiutil attach -nobrowse -readonly` numa pasta temporária.
+- O `Cunha Tools.app` do DMG precisa ter o bundle ID da suíte aberta, a versão da release e passar no `codesign --verify --deep --strict`.
+- A suíte nova vai para a pasta de instalação, de onde quer que a cópia aberta esteja. O DMG é desmontado. Depois, as tools instaladas mais antigas que as da suíte nova são trocadas, e as outras cópias da suíte nessa pasta e a cópia aberta vão para o Lixo. Uma cópia num DMG ou em App Translocation fica onde está.
+- Em sucesso ou falha, o DMG é desmontado e a pasta do download é apagada.
+- O `build-suite.sh` grava `CunhaSourceCommit` no `Info.plist` da suíte com `git rev-parse HEAD`. A barra lateral mostra o commit ao lado da versão.
 
 ## Build
 
-`scripts/build-suite.sh` builda as tools, o APK e a suíte, e embute tudo. `SKIP_ANDROID=1` pula o APK. Uma tool que não compila fica de fora, com aviso. `scripts/make-dmg.sh` empacota o último build em `build/CunhaTools-<versão>.dmg`.
+`scripts/build-suite.sh` builda as tools, o APK e a suíte, e embute tudo. `SKIP_ANDROID=1` pula o APK. Uma tool que não compila fica de fora, com aviso. `scripts/make-dmg.sh` empacota o último build em `build/CunhaTools-<versão>.dmg`. `scripts/release.sh` publica a release `v<versão>` com o `CunhaTools.dmg`; os passos estão no [README da raiz](../README.md#publicar-uma-versão).
 
 ## Verificação
 
 | Comando | O que verifica |
 |---|---|
 | `CUNHA_INSTALL_DIR=<pasta> CunhaTools --selftest-install` | Catálogo, instalação, versão, atualização, cópia antiga no Lixo e remoção numa pasta de teste |
-| `CUNHA_INSTALL_DIR=<pasta> [CUNHA_UPDATE_BRANCH=<branch>] CunhaTools --selftest-update` | GitHub real: decisão, download, build, commit gravado, assinatura e troca da suíte numa pasta de teste |
+| `CUNHA_INSTALL_DIR=<pasta> CUNHA_UPDATE_DMG=<dmg> CunhaTools --selftest-update` | GitHub real: `releases/latest` do repositório e uma release sem o `CunhaTools.dmg` (`apple/swift-argument-parser`). Com o DMG local, pelo mesmo caminho do botão: download para o cache, montagem, conferência, troca da suíte numa pasta de teste, nenhum mount no `hdiutil info` e cache apagado. Seis DMGs recusados sem mexer na cópia instalada: download que falha, DMG que não monta, sem o app, outro bundle ID, sem assinatura e outra versão. O DMG vem do `make-dmg.sh` ou do `DRY_RUN=1 ./scripts/release.sh` e tem a versão do binário |
 | `CunhaTools --selftest-phone` | QR de pareamento e leitura das respostas do adb |
 | `CunhaTools --selftest-bonjour` | Busca e resolução mDNS de um serviço de pareamento falso |
 | `CunhaTools --selftest-remote` | Com o Sound Manager aberto: arraste do volume geral (mensagens por arraste e valor final), volume real do Mac, mudo, mudo e volume de um app tocando som, ícone saindo e voltando à barra de menus, reabertura, mensagens inválidas, fechar e abrir. Restaura tudo no fim. O volume de um app só é testado se o valor salvo dele estiver no volume geral ou abaixo |
 | `CunhaTools --selftest-platform-tools <pasta>` | Download e extração do platform-tools |
-| `CunhaTools --render-ui <saída.png> [--page inicio\|celular\|<tool>] [--guide] [--contribute] [--phone] [--qr] [--light\|--dark] [--width <pt>] [--wait s]` | Barra lateral e página renderizadas em PNG, sem split view. `--guide` abre **Como usar**. `--contribute` renderiza só o popup do Pix. `--width` define a largura da página, padrão 830. `--qr` mostra o QR sem ler os celulares conectados; `--qr --wait 21` mostra o aviso de 20 s |
+| `CunhaTools --render-ui <saída.png> [--page inicio\|celular\|<tool>] [--guide] [--contribute] [--phone] [--qr] [--update <fase>] [--light\|--dark] [--width <pt>] [--wait s]` | Barra lateral e página renderizadas em PNG, sem split view. `--guide` abre **Como usar**. `--contribute` renderiza só o popup do Pix. `--width` define a largura da página, padrão 830. `--qr` mostra o QR sem ler os celulares conectados; `--qr --wait 21` mostra o aviso de 20 s. `--update consultando\|baixando\|instalando\|atualizado\|falha` mostra essa fase do Atualizar sem consultar o GitHub |

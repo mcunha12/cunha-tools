@@ -1,6 +1,6 @@
 #!/bin/zsh
 # Builds every tool, the Android companion and the suite, then embeds them in build/Cunha Tools.app. ARCHS and SCRATCH work as in build.sh; SKIP_ANDROID=1 skips the APK.
-# The suite's Info.plist gets CunhaSourceCommit from CUNHA_SOURCE_COMMIT, else from git; the update check compares it with GitHub.
+# The suite's Info.plist gets CunhaSourceCommit from git; the sidebar shows it next to the version.
 set -euo pipefail
 
 ROOT="${0:A:h:h}"
@@ -63,11 +63,11 @@ if [[ -n "$APK" ]]; then
   cp "$APK" "$SUITE/Contents/Resources/Android/cunha-companion.apk"
 fi
 
-COMMIT="${CUNHA_SOURCE_COMMIT:-$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)}"
+COMMIT="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)"
 if [[ -n "$COMMIT" ]]; then
   plutil -replace CunhaSourceCommit -string "$COMMIT" "$SUITE/Contents/Info.plist"
 else
-  warn "sem commit de origem, o Atualizar vai oferecer atualização"
+  warn "sem commit de origem, a barra lateral mostra build local"
 fi
 
 # No --deep: each embedded tool keeps its own signature and identifier.

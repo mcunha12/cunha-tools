@@ -1,44 +1,41 @@
 import Foundation
 
-enum CommitComparison: String {
-    case identical, ahead, behind, diverged
+struct Release: Sendable {
+    let version: String
+    let dmg: URL?
 }
 
 // GitHub REST without a token: 60 requests per hour per IP, enough for a manual button.
 struct UpdateSource: Sendable {
     let repository: String
-    let branch: String
 
-    static let branchOverrideKey = "CUNHA_UPDATE_BRANCH"
+    static let assetName = "CunhaTools.dmg"
+    static let noReleaseMessage = "O GitHub ainda não tem versão publicada do Cunha Tools."
 
     static var configured: UpdateSource? {
-        let info = Bundle.main.infoDictionary ?? [:]
-        guard let repository = info["CunhaUpdateRepository"] as? String, !repository.isEmpty else { return nil }
-        let branch = ProcessInfo.processInfo.environment[branchOverrideKey] ?? info["CunhaUpdateBranch"] as? String ?? "main"
-        return UpdateSource(repository: repository, branch: branch)
+        guard let repository = Bundle.main.infoDictionary?["CunhaUpdateRepository"] as? String, !repository.isEmpty else { return nil }
+        return UpdateSource(repository: repository)
     }
 
-    func latestCommit() async throws -> String {
-        guard let sha = try await object(path: "commits/\(branch)")?["sha"] as? String else {
-            throw InstallError(message: "O GitHub não devolveu o último commit de \(branch).")
+    // GitHub leaves drafts and pre-releases out of releases/latest.
+    func latestRelease() async throws -> Release {
+        guard let json = try await object(path: "releases/latest", allowMissing: true), let tag = json["tag_name"] as? String else {
+            throw InstallError(message: Self.noReleaseMessage)
         }
-        return sha
+        let asset = (json["assets"] as? [[String: Any]])?.first { $0["name"] as? String == Self.assetName }
+        let dmg = (asset?["browser_download_url"] as? String).flatMap(URL.init(string:))
+        return Release(version: tag.hasPrefix("v") ? String(tag.dropFirst()) : tag, dmg: dmg)
     }
 
-    // nil when GitHub does not know the installed commit, as in a local build that was never pushed.
-    func comparison(from installed: String, to latest: String) async throws -> CommitComparison? {
-        guard let json = try await object(path: "compare/\(installed)...\(latest)", allowMissing: true) else { return nil }
-        return (json["status"] as? String).flatMap(CommitComparison.init(rawValue:))
-    }
-
-    func downloadSource(of commit: String, to file: URL) async throws {
+    func download(_ url: URL, to file: URL) async throws {
         let temporary: URL, response: URLResponse
         do {
-            (temporary, response) = try await URLSession.shared.download(for: request(path: "tarball/\(commit)"))
+            (temporary, response) = try await URLSession.shared.download(for: URLRequest(url: url, timeoutInterval: 60))
         } catch {
-            throw InstallError(message: "Sem conexão com o GitHub: \(error.localizedDescription)")
+            throw InstallError(message: "O download do \(Self.assetName) parou: \(error.localizedDescription)")
         }
-        try check(response)
+        // The self-test downloads a local DMG through a file URL, which has no HTTP status.
+        if response is HTTPURLResponse { try check(response) }
         try? FileManager.default.removeItem(at: file)
         try FileManager.default.moveItem(at: temporary, to: file)
     }
