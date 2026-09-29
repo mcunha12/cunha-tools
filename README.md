@@ -81,37 +81,25 @@ Clique e arraste toca e desliza. Botão direito volta. Botão do meio vai para o
 
 ## Instalação
 
-### Requisitos
+Requisito: macOS 15 ou superior.
 
-- macOS 15 ou superior.
-- Command Line Tools da Apple: `xcode-select --install`. O Xcode não é necessário.
-- Para o app Android: Android SDK em `~/Library/Android/sdk` (`platforms;android-35`, `build-tools;35.0.0`) e JDK 17 (`brew install openjdk@17`). Sem eles, a suíte compila sem o app companheiro. O APK pronto também fica em `dist/android/cunha-companion.apk`.
+1. Baixe o [`CunhaTools.dmg`](https://github.com/mcunha12/cunha-tools/releases/latest/download/CunhaTools.dmg) da última versão.
+2. Abra o DMG e arraste o **Cunha Tools** para **Aplicativos**.
+3. Abra o Cunha Tools na pasta Aplicativos. O macOS bloqueia a primeira abertura, porque o app não é notarizado pela Apple.
+4. Em Ajustes do Sistema → Privacidade e Segurança, clique em **Abrir Mesmo Assim** e confirme com a senha do Mac. Alternativa no Terminal:
 
-### Build e instalação
+   ```sh
+   xattr -dr com.apple.quarantine "/Applications/Cunha Tools.app"
+   ```
 
-```sh
-git clone https://github.com/mcunha12/cunha-tools.git
-cd cunha-tools
-./scripts/build-suite.sh
-open "build/Cunha Tools.app"
-```
+5. Na página Início do Cunha Tools, clique em **Instalar** na linha da tool e depois em **Instalar** na página dela. A tool vai para `/Applications` e abre.
 
-Na página Início do Cunha Tools, clique em **Instalar** na linha da tool e depois em **Instalar** na página dela. A tool vai para `/Applications` e abre.
-
-Para instalar só o Sound Manager, sem o gerenciador: `./scripts/install.sh tools/sound-manager`.
-
-O primeiro build cria a identidade de assinatura local "Cunha Tools Local Signing" num keychain próprio, `~/Library/Keychains/cunhatools-signing.keychain-db`, e o adiciona à lista de keychains do usuário. Com a mesma identidade, o macOS mantém as permissões entre builds.
+Para compilar a partir do código, veja [Build](#build).
 
 ### Primeira abertura
 
 1. O macOS pede a permissão "Gravação de áudio do sistema". Clique em **Permitir**. Sem ela, o volume por app não funciona. O volume geral de um dispositivo com volume próprio funciona sem ela.
 2. Aberto a partir de `/Applications` ou `~/Applications`, o Sound Manager se registra para abrir no login. O checkbox "Abrir ao iniciar o Mac", no rodapé do menu, desliga o registro.
-
-Os apps não são notarizados pela Apple. Copiados para outro Mac, a primeira abertura é bloqueada. Para liberar: Ajustes do Sistema → Privacidade e Segurança → **Abrir Mesmo Assim**. Alternativa no Terminal:
-
-```sh
-xattr -dr com.apple.quarantine "/Applications/Cunha Tools.app"
-```
 
 ### Celular Android
 
@@ -132,28 +120,20 @@ O Mac e o celular precisam estar na mesma rede Wi-Fi. Os passos completos estão
 
 ### Atualizar
 
-Clique em **Atualizar**, no rodapé da barra lateral. O botão compara o commit que gerou o app aberto com o último commit do `main` no GitHub. Se o `main` estiver à frente, o Cunha Tools:
+Clique em **Atualizar**, no rodapé da barra lateral. O botão lê a última versão publicada em [Releases](https://github.com/mcunha12/cunha-tools/releases). Se ela for maior que a versão aberta, o Cunha Tools:
 
-1. Baixa o código daquele commit.
-2. Compila com o `scripts/build-suite.sh` do próprio código, só na arquitetura do Mac. Download e build levaram 303 s num MacBook Air com a máquina ocupada.
-3. Atualiza as tools instaladas cuja versão ficou para trás e reabre as que estavam abertas.
-4. Instala o próprio app na pasta de instalação (`/Applications`, ou `~/Applications` sem permissão de escrita) e reabre.
+1. Baixa o `CunhaTools.dmg` dessa versão.
+2. Confere o app dentro do DMG: mesmo identificador, versão igual à da release e assinatura válida.
+3. Instala o app na pasta de instalação (`/Applications`, ou `~/Applications` sem permissão de escrita).
+4. Atualiza as tools instaladas cuja versão ficou para trás e reabre as que estavam abertas.
 5. Manda para o Lixo as outras cópias do Cunha Tools: as de `/Applications` e `~/Applications` com outro nome e a cópia que estava aberta, se ela estava fora dessas pastas. Uma cópia num DMG fica onde está.
+6. Apaga o download e reabre.
 
-- A atualização exige o Command Line Tools. Sem ele, o botão mostra o comando de instalação.
-- O build usa a identidade de assinatura local. Num Mac que instalou pelo DMG, a primeira atualização cria essa identidade, e o macOS pede de novo a permissão de áudio uma vez.
-- O log do último build fica em `~/Library/Logs/Cunha Tools/update.log`.
+- Com a versão publicada igual ou menor que a aberta, o botão mostra **Atualizado** e não baixa nada.
+- Uma falha no download ou na conferência do DMG não mexe na cópia instalada. O botão mostra o motivo.
+- O Cunha Tools tira a quarentena da cópia instalada. A versão nova abre sem o **Abrir Mesmo Assim**.
 - Uma tool só é trocada quando o `CFBundleVersion` dela sobe. Suba a versão a cada mudança numa tool.
 - Instalar ou atualizar uma tool manda para o Lixo as outras cópias dela em `/Applications` e `~/Applications`.
-
-### Distribuir em DMG
-
-```sh
-./scripts/build-suite.sh
-./scripts/make-dmg.sh
-```
-
-O resultado é `build/CunhaTools-<versão>.dmg`, com o atalho para Aplicativos e o guia [`dist/Como instalar.txt`](dist/Como%20instalar.txt).
 
 ## Limites
 
@@ -176,11 +156,25 @@ O resultado é `build/CunhaTools-<versão>.dmg`, com o atalho para Aplicativos e
 | `tools/pair-screen/` | Pair Screen: cliente scrcpy nativo. O `build-hook.sh` baixa o `scrcpy-server` e confere o SHA-256 |
 | `android/` | App companheiro Android, Java sem Gradle |
 | `shared/CunhaKit/` | Código comum: item de início, comandos gerenciador → tool, estado da tool, canal gerenciador ↔ Sound Manager, slider com teto, cliente adb |
-| `scripts/` | Build, instalação, assinatura, ícone e DMG |
+| `scripts/` | Build, instalação, assinatura, ícone, DMG e release |
 | `dist/` | Guia de instalação que vai no DMG e o APK pronto do app companheiro |
 | `docs/` | Imagens deste README |
 
 ## Build
+
+Requisitos:
+
+- Command Line Tools da Apple: `xcode-select --install`. O Xcode não é necessário.
+- Para o app Android: Android SDK em `~/Library/Android/sdk` (`platforms;android-35`, `build-tools;35.0.0`) e JDK 17 (`brew install openjdk@17`). Sem eles, a suíte compila sem o app companheiro. O APK pronto também fica em `dist/android/cunha-companion.apk`.
+
+```sh
+git clone https://github.com/mcunha12/cunha-tools.git
+cd cunha-tools
+./scripts/build-suite.sh
+open "build/Cunha Tools.app"
+```
+
+O primeiro build cria a identidade de assinatura local "Cunha Tools Local Signing" num keychain próprio, `~/Library/Keychains/cunhatools-signing.keychain-db`, e o adiciona à lista de keychains do usuário. Com a mesma identidade, o macOS mantém as permissões entre builds.
 
 | Comando | Resultado |
 |---|---|
@@ -188,7 +182,8 @@ O resultado é `build/CunhaTools-<versão>.dmg`, com o atalho para Aplicativos e
 | `./scripts/install.sh tools/sound-manager` | Build, troca a cópia em `/Applications` e abre |
 | `./scripts/build-suite.sh` | `build/Cunha Tools.app` com as tools e o APK embutidos |
 | `android/build.sh` | `build/android/cunha-companion.apk` e a cópia em `dist/android/` |
-| `./scripts/make-dmg.sh` | `build/CunhaTools-<versão>.dmg` |
+| `./scripts/make-dmg.sh` | `build/CunhaTools-<versão>.dmg`, com o atalho para Aplicativos e o guia [`dist/Como instalar.txt`](dist/Como%20instalar.txt) |
+| `./scripts/release.sh` | Build universal, `build/CunhaTools.dmg` e a release `v<versão>` no GitHub com esse DMG |
 | `swift scripts/make-icon.swift <símbolo> <#topo> <#base> <saída.icns>` | Ícone a partir de um SF Symbol sobre gradiente |
 
 | Variável | Efeito |
@@ -197,6 +192,19 @@ O resultado é `build/CunhaTools-<versão>.dmg`, com o atalho para Aplicativos e
 | `SCRATCH=<pasta>` | Pasta de build do SwiftPM separada, para builds em paralelo |
 | `CUNHA_ONLY=tools/sound-manager,suite` | Limita o pacote às pastas listadas |
 | `SKIP_ANDROID=1` | Compila a suíte sem o app companheiro |
+| `DRY_RUN=1` | O `release.sh` gera o DMG e mostra as chamadas à API do GitHub sem enviar nada |
+
+### Publicar uma versão
+
+1. Suba `CFBundleShortVersionString` e `CFBundleVersion` em `suite/Resources/Info.plist`. A tag da release é `v` + `CFBundleShortVersionString`.
+2. Faça o merge no `main` e atualize o clone. O `release.sh` exige a árvore sem mudanças e o `HEAD` igual ao `origin/main`.
+3. Rode `./scripts/release.sh`.
+
+- O script recusa uma tag que já existe no GitHub e uma suíte sem alguma tool, sem o APK ou sem as duas arquiteturas.
+- O script cria a release como rascunho, envia o `CunhaTools.dmg` e só então publica. Se o envio falhar, o script apaga o rascunho, e a versão publicada antes continua sendo a última.
+- O token vem do `git credential fill`, a mesma credencial do `git push`.
+- O asset tem sempre o nome `CunhaTools.dmg`. O link `releases/latest/download/CunhaTools.dmg` aponta para a versão mais nova.
+- Rode o `release.sh` no Mac que tem a identidade "Cunha Tools Local Signing". Com outra identidade, cada Mac pede de novo as permissões das tools.
 
 ## Adicionar uma tool
 
@@ -223,7 +231,7 @@ O Command Line Tools não executa XCTest nem swift-testing. Cada app traz autote
 | Comando | O que verifica |
 |---|---|
 | `CUNHA_INSTALL_DIR=<pasta> "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-install` | Catálogo, instalação, atualização e remoção numa pasta de teste |
-| `CUNHA_INSTALL_DIR=<pasta> [CUNHA_UPDATE_BRANCH=<branch>] "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-update` | Atualizar contra o GitHub real: decisão, download, build, commit gravado e troca da suíte numa pasta de teste. Leva até 5 minutos |
+| `CUNHA_INSTALL_DIR=<pasta> CUNHA_UPDATE_DMG=<dmg> "build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-update` | Atualizar: consulta da release no GitHub real, depois download, conferência e troca da suíte numa pasta de teste com um DMG local, e recusa de seis DMGs quebrados |
 | `"build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-phone` | QR de pareamento e leitura das respostas do adb |
 | `"build/Cunha Tools.app/Contents/MacOS/CunhaTools" --selftest-remote` | Canal com o Sound Manager aberto: volume geral, mudo, volume por app, ícone na barra de menus, mensagens inválidas, fechar e abrir. Altera o volume real do Mac e restaura no fim |
 | `"build/Cunha Tools.app/Contents/MacOS/CunhaTools" --render-ui <saída.png> [--page inicio\|celular\|<tool>] [--guide] [--contribute] [--dark]` | Barra lateral e página renderizadas em PNG |
