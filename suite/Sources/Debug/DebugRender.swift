@@ -1,13 +1,14 @@
 import AppKit
 import SwiftUI
 
-// --render-ui <png> [--page inicio|celular|<tool>] [--guide] [--contribute] [--phone] [--qr] [--light|--dark] [--wait s]: sidebar and page offscreen, without scroll or split view.
+// --render-ui <png> [--page inicio|celular|<tool>] [--guide] [--contribute] [--phone] [--qr] [--light|--dark] [--width pt] [--wait s]: sidebar and page offscreen, without scroll or split view.
 enum DebugRender {
     static func runIfRequested() -> Bool {
         let arguments = CommandLine.arguments
         guard let index = arguments.firstIndex(of: "--render-ui"), arguments.count > index + 1 else { return false }
         let output = URL(fileURLWithPath: arguments[index + 1])
         let delay = value(after: "--wait", in: arguments).flatMap(Double.init) ?? 2.5
+        let width = value(after: "--width", in: arguments).flatMap(Double.init) ?? 830
 
         let application = NSApplication.shared
         application.setActivationPolicy(.prohibited)
@@ -25,7 +26,7 @@ enum DebugRender {
                     .background(Color(nsColor: .underPageBackgroundColor))
                 Divider()
                 PageContent(page: .constant(page), showsPhone: showsPhone, opensGuide: arguments.contains("--guide"))
-                    .frame(width: 830)
+                    .frame(width: width)
                     .background(Palette.canvas)
             }
             let content = arguments.contains("--contribute") ? AnyView(ContributeView().background(Palette.canvas)) : AnyView(layout)

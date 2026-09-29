@@ -19,15 +19,8 @@ struct OverviewPage: View {
                 StatusPill(text: pill.text, symbol: pill.symbol, color: pill.color, caption: "Versão \(Bundle.main.shortVersion)")
             }
             ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: 20) {
-                    hero.frame(minWidth: 340, idealWidth: 364, maxWidth: .infinity, maxHeight: .infinity)
-                    ring.frame(width: 356).frame(maxHeight: .infinity)
-                }
-                .fixedSize(horizontal: false, vertical: true)
-                VStack(spacing: 20) {
-                    hero
-                    ring
-                }
+                cards(compact: false)
+                cards(compact: true)
             }
             SectionHeader(title: "Tools", detail: "Instaladas em \(installDir)")
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 250), spacing: 16)], spacing: 16) {
@@ -74,6 +67,15 @@ struct OverviewPage: View {
         return "\(counted(total, "tool instalada", "tools instaladas")) na versão desta suíte. A página de cada tool tem a configuração e o guia."
     }
 
+    // The compact ring card puts the legend under the ring, so both cards share one row at the window's minimum width.
+    private func cards(compact: Bool) -> some View {
+        HStack(alignment: .top, spacing: 20) {
+            hero.frame(idealWidth: 364, maxWidth: .infinity, maxHeight: .infinity)
+            ring(compact: compact).frame(width: compact ? 200 : 356).frame(maxHeight: .infinity)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
     private var hero: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top) {
@@ -85,12 +87,17 @@ struct OverviewPage: View {
             Text(headline).font(.system(size: 30, weight: .bold)).padding(.bottom, 10)
             Text(summary).font(.title3).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 30)
-            HStack(spacing: 18) {
-                primaryAction
-                if !tools.pending.isEmpty { Label("As tools vêm dentro do app", systemImage: "shippingbox").foregroundStyle(.secondary) }
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 18) { primaryAction; bundledNote }
+                VStack(alignment: .leading, spacing: 12) { primaryAction; bundledNote }
             }
         }
         .card(padding: 30)
+    }
+
+    @ViewBuilder
+    private var bundledNote: some View {
+        if !tools.pending.isEmpty { Label("As tools vêm dentro do app", systemImage: "shippingbox").foregroundStyle(.secondary) }
     }
 
     @ViewBuilder
@@ -117,8 +124,9 @@ struct OverviewPage: View {
         }
     }
 
-    private var ring: some View {
-        VStack(alignment: .leading, spacing: 22) {
+    private func ring(compact: Bool) -> some View {
+        let layout = compact ? AnyLayout(VStackLayout(spacing: 22)) : AnyLayout(HStackLayout(spacing: 20))
+        return VStack(alignment: .leading, spacing: 22) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Tools no Mac").font(.title2.weight(.semibold))
@@ -130,7 +138,7 @@ struct OverviewPage: View {
                     .foregroundStyle(Palette.accent)
                     .help("Ler de novo as tools instaladas")
             }
-            HStack(spacing: 20) {
+            layout {
                 StatusRing(segments: [(open, Palette.accent), (total - missing - open, Palette.closed)], total: total) {
                     VStack(spacing: 2) {
                         Text("\(total - missing)/\(total)").font(.system(size: 26, weight: .bold).monospacedDigit())
