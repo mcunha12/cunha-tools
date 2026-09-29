@@ -16,7 +16,8 @@ enum DebugRender {
             let tools = ToolsModel()
             let phone = PhoneModel()
             let showsPhone = tools.needsPhone || arguments.contains("--phone")
-            if showsPhone { phone.start() }
+            // A connected phone would replace the QR, so --qr leaves the device tracker off.
+            if showsPhone && !arguments.contains("--qr") { phone.start() }
             if arguments.contains("--qr") { phone.showPairingPreview(.random()) }
             let page = page(named: value(after: "--page", in: arguments), in: tools)
             let layout = HStack(alignment: .top, spacing: 0) {

@@ -13,9 +13,15 @@ struct PairStep: View {
                     Text("Toque em Permitir no aviso de depuração USB do celular.").font(.caption).foregroundStyle(.orange)
                 }
                 qr
-                if let message = phone.pairingMessage { ErrorText(text: message) }
+                if let message = phone.pairingMessage {
+                    ErrorText(text: message)
+                } else if phone.phoneNotSeen {
+                    Text("O Mac não encontrou o celular na rede. Confira se os dois estão no mesmo Wi-Fi ou use \"Parear com código\".")
+                        .font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
+                }
                 DisclosureGroup("Parear com código", isExpanded: $showsManual) { manual }
                     .font(.caption)
+                    .onChange(of: phone.phoneNotSeen) { _, notSeen in if notSeen { showsManual = true } }
             }
             .disabled(phone.adbURL == nil)
         }
