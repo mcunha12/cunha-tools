@@ -24,11 +24,9 @@
 	<string>1</string>
 	<key>CunhaToolGuide</key>
 	<array>
-		<string>Na página Celular, pareie o celular.</string>
-		<string>Clique no ícone da tool na barra de menus e em Conectar. A tela do celular abre numa janela flutuante.</string>
-		<string>Clique e arraste para tocar e deslizar. Botão direito volta. Botão do meio vai para o início. ⌘V cola o clipboard do Mac no celular.</string>
-		<string>Arraste a janela pela faixa superior, ou com ⌥ + arrastar em qualquer ponto.</string>
-		<string>No menu da tool: resolução, fps, bitrate, codec, Sempre no topo e Desligar a tela do celular durante o espelhamento.</string>
+		<string>Pareie o celular na página Celular.</string>
+		<string>No menu da tool, clique em Conectar. A tela do celular abre numa janela flutuante.</string>
+		<string>Clique e arraste para tocar e deslizar. Botão direito volta. ⌘V cola o clipboard do Mac no celular.</string>
 	</array>
 	<key>CunhaToolRequirements</key>
 	<array>

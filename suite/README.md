@@ -6,7 +6,8 @@ App com janela única. Instala, atualiza, remove e configura as tools embutidas,
 
 - Barra lateral: Início, uma página por tool e Celular. O ponto ao lado de cada tool mostra o estado: laranja para atualização ou configuração pendente, verde-azulado para aberta, cinza para não instalada.
 - Início: selo de estado, card com a próxima ação, anel de tools abertas, fechadas e não instaladas, e grade com um card por tool.
-- Página da tool: instalar, atualizar, abrir e remover. Aba **Configuração**: requisitos, "Configurar" e "Abrir ao iniciar o Mac". Aba **Guia**: passos de `CunhaToolGuide`. A página abre no Guia quando a tool está instalada e configurada.
+- Página da tool, de cima para baixo: card de instalar, atualizar, abrir e remover. Card de configuração: requisitos, "Configurar" e "Abrir ao iniciar o Mac". **Como usar**, fechado: passos de `CunhaToolGuide`.
+- Página do Sound Manager: card **Volumes** entre os dois primeiros e "Mostrar na barra de menus" no card de configuração. Detalhes em [Sound Manager](#sound-manager).
 - Rodapé: **Atualizar**, **Contribua** (popup com o QR Pix e o código copia e cola) e **Aparência**, gravada em `UserDefaults`.
 
 ## Tools
@@ -15,6 +16,18 @@ App com janela única. Instala, atualiza, remove e configura as tools embutidas,
 - Instalar e atualizar copiam a tool para `/Applications`. Sem permissão de escrita, a cópia vai para `~/Applications`. A cópia aberta é encerrada antes da troca. Depois, as outras cópias da tool nessas duas pastas, com o mesmo bundle ID e qualquer nome, vão para o Lixo.
 - Remover desliga o item de início, encerra a tool e a move para o Lixo.
 - "Abrir ao iniciar o Mac" e "Configurar" enviam comandos para a tool (`ToolControl`). O estado vem de `~/Library/Application Support/Cunha Tools/status/<bundle id>.json`.
+- A suíte sabe se uma tool está aberta pela lista `NSWorkspace.runningApplications`, observada por KVO. As notificações de abertura e fechamento do `NSWorkspace` não chegam para apps de barra de menus (`LSUIElement`), e toda tool é um.
+
+## Sound Manager
+
+A página conversa com o Sound Manager aberto por `SoundChannel` (`shared/CunhaKit/SoundChannel.swift`), em distributed notifications locais.
+
+- O Sound Manager publica o estado inteiro a cada mudança e quando a suíte pede: dispositivo de saída, volume geral, mudo, apps tocando som (volume salvo, volume efetivo, mudo) e o ícone na barra de menus.
+- A suíte manda ações: volume e mudo do geral, volume e mudo de um app, ícone visível ou oculto, pedido de estado.
+- No arraste, a suíte manda no máximo uma ação a cada 50 ms por slider, sempre com o último valor. O slider mostra o valor local por 0,5 s depois do último movimento.
+- O card **Volumes** usa o mesmo slider do menu: para no volume geral e esmaece a trilha acima dele.
+- Sound Manager fechado: o card mostra "Abrir". Sem resposta em 2 s: o card pede para atualizar o Sound Manager quando há versão nova, ou diz que ele não respondeu.
+- O volume por aba do Chrome fica só no menu do Sound Manager.
 
 ## Celular
 
@@ -44,5 +57,6 @@ App com janela única. Instala, atualiza, remove e configura as tools embutidas,
 | `CUNHA_INSTALL_DIR=<pasta> [CUNHA_UPDATE_BRANCH=<branch>] CunhaTools --selftest-update` | GitHub real: decisão, download, build, commit gravado, assinatura e troca da suíte numa pasta de teste |
 | `CunhaTools --selftest-phone` | QR de pareamento e leitura das respostas do adb |
 | `CunhaTools --selftest-bonjour` | Busca e resolução mDNS de um serviço de pareamento falso |
+| `CunhaTools --selftest-remote` | Com o Sound Manager aberto: arraste do volume geral (mensagens por arraste e valor final), volume real do Mac, mudo, mudo e volume de um app tocando som, ícone saindo e voltando à barra de menus, reabertura, mensagens inválidas, fechar e abrir. Restaura tudo no fim. O volume de um app só é testado se o valor salvo dele estiver no volume geral ou abaixo |
 | `CunhaTools --selftest-platform-tools <pasta>` | Download e extração do platform-tools |
-| `CunhaTools --render-ui <saída.png> [--page inicio\|celular\|<tool>] [--guide] [--contribute] [--phone] [--qr] [--light\|--dark] [--width <pt>] [--wait s]` | Barra lateral e página renderizadas em PNG, sem split view. `--contribute` renderiza só o popup do Pix. `--width` define a largura da página, padrão 830. `--qr` mostra o QR sem ler os celulares conectados; `--qr --wait 21` mostra o aviso de 20 s |
+| `CunhaTools --render-ui <saída.png> [--page inicio\|celular\|<tool>] [--guide] [--contribute] [--phone] [--qr] [--light\|--dark] [--width <pt>] [--wait s]` | Barra lateral e página renderizadas em PNG, sem split view. `--guide` abre **Como usar**. `--contribute` renderiza só o popup do Pix. `--width` define a largura da página, padrão 830. `--qr` mostra o QR sem ler os celulares conectados; `--qr --wait 21` mostra o aviso de 20 s |

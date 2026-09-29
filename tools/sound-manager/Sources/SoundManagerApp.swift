@@ -12,9 +12,10 @@ enum Main {
 
 struct SoundManagerApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
+    @StateObject private var menuBarIcon = MenuBarIconSetting.shared
 
     var body: some Scene {
-        MenuBarExtra {
+        MenuBarExtra(isInserted: $menuBarIcon.isVisible) {
             MenuContentView()
                 .environmentObject(delegate.model)
                 .environmentObject(delegate.model.master)
@@ -32,6 +33,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let model = AppModel()
     let bridge = BrowserBridge()
     let launchAtLogin = LaunchAtLogin()
+    private var remote: RemoteControl?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         bridge.start()
@@ -39,6 +41,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         model.requestPermissionIfNeeded()
         launchAtLogin.applyDefault()
         ToolControl.listen(launchAtLogin: launchAtLogin, openSetup: model.requestPermission)
+        remote = RemoteControl(delegate: self)
+    }
+
+    // Opening the app again while it runs brings back a hidden menu bar icon.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        MenuBarIconSetting.shared.isVisible = true
+        return false
     }
 
     func applicationWillTerminate(_ notification: Notification) {

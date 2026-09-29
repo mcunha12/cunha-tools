@@ -8,8 +8,8 @@ Requisito: macOS 15 ou superior.
    Alternativa no Terminal:
    xattr -dr com.apple.quarantine "/Applications/Cunha Tools.app"
 4. Na página Início do Cunha Tools, clique em "Instalar tudo". As tools vão para a pasta Aplicativos e abrem. A página de cada tool, na barra lateral, também tem "Instalar".
-5. Cada tool pede as próprias permissões na primeira abertura. A aba Configuração da página da tool mostra o que falta. "Configurar" abre o ajuste da tool.
-6. "Abrir ao iniciar o Mac", na mesma aba, liga ou desliga a abertura automática de cada tool.
+5. Cada tool pede as próprias permissões na primeira abertura. A página da tool mostra o que falta. "Configurar" abre o ajuste da tool.
+6. "Abrir ao iniciar o Mac", na mesma página, liga ou desliga a abertura automática de cada tool. "Como usar", no fim da página, mostra os passos de uso.
 
 O Cunha Tools fecha quando a janela fecha. As tools continuam abertas.
 Para atualizar: clique em "Atualizar", no rodapé da barra lateral. O Cunha Tools baixa o código novo do GitHub, compila, troca as tools e reabre. As cópias antigas do Cunha Tools vão para o Lixo. A atualização exige o Command Line Tools: no Terminal, xcode-select --install.
@@ -37,6 +37,7 @@ SOUND MANAGER
 
 Na primeira abertura, clique em "Permitir" no pedido de "Gravação de áudio do sistema". Sem essa permissão, o volume por app não funciona.
 O ícone de onda sonora verde aparece na barra de menus.
+Na página Sound Manager do Cunha Tools, o card Volumes muda o volume geral e o de cada app. "Mostrar na barra de menus" esconde ou mostra o ícone. Com o ícone oculto, abra o Sound Manager de novo na pasta Aplicativos, com ele já aberto, e o ícone volta.
 
 Volume por aba no Chrome:
 

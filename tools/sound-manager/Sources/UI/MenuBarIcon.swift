@@ -21,3 +21,23 @@ enum MenuBarIcon {
         return image
     }()
 }
+
+// Whether the menu bar icon shows; saved in UserDefaults, visible by default. The scene binds to it through a StateObject.
+@MainActor
+final class MenuBarIconSetting: ObservableObject {
+    static let shared = MenuBarIconSetting()
+    private static let key = "showsMenuBarIcon"
+
+    private var stored = UserDefaults.standard.object(forKey: MenuBarIconSetting.key) as? Bool ?? true
+
+    // MenuBarExtra writes the value back on every scene update; publishing an equal value would loop.
+    var isVisible: Bool {
+        get { stored }
+        set {
+            guard newValue != stored else { return }
+            objectWillChange.send()
+            stored = newValue
+            UserDefaults.standard.set(newValue, forKey: Self.key)
+        }
+    }
+}

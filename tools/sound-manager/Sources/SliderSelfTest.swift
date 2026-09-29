@@ -1,4 +1,5 @@
 import AppKit
+import CunhaKit
 import SwiftUI
 
 // --selftest-slider: synthetic mouse events on a LevelSlider 205 pt wide, as in the menu.

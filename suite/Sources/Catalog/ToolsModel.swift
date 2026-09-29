@@ -26,21 +26,16 @@ final class ToolsModel: ObservableObject {
 
     private let tools: [ToolBundle]
     private var watcher: DirectoryWatcher?
+    private var runningObservation: NSKeyValueObservation?
     private var observers: [NSObjectProtocol] = []
 
     init(tools: [ToolBundle] = ToolCatalog.load()) {
         self.tools = tools
         refresh()
         watcher = DirectoryWatcher(url: SuitePaths.status) { [weak self] in self?.refresh() }
-        let workspace = NSWorkspace.shared.notificationCenter
-        for name in [NSWorkspace.didLaunchApplicationNotification, NSWorkspace.didTerminateApplicationNotification] {
-            observers.append(workspace.addObserver(forName: name, object: nil, queue: .main) { [weak self] note in
-                let bundleID = (note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication)?.bundleIdentifier
-                MainActor.assumeIsolated {
-                    guard let self, let bundleID, self.tools.contains(where: { $0.bundleID == bundleID }) else { return }
-                    self.refresh()
-                }
-            })
+        runningObservation = RunningTool.observeRunningApps { [weak self] in
+            guard let self, self.entries.map(\.isRunning) != self.tools.map({ RunningTool.isRunning($0.bundleID) }) else { return }
+            self.refresh()
         }
         observers.append(NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.refresh() }

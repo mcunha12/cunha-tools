@@ -149,3 +149,14 @@ final class AppModel: ObservableObject {
         if router.failures != failures { failures = router.failures }
     }
 }
+
+extension AppModel {
+    // Apps the menu and the suite list: a browser with the extension shows while one of its tabs has sound.
+    func visibleApps(bridge: BrowserBridge) -> [AppItem] {
+        let audible = Set(audibleApps.map(\.id))
+        return apps.filter { app in
+            let sessions = BrowserCatalog.isExtensionBrowser(app.bundleID) ? bridge.sessions(matchingAppNamed: app.name, bundleID: app.bundleID) : []
+            return sessions.isEmpty ? audible.contains(app.id) : !bridge.tabsWithSound(in: sessions).isEmpty
+        }
+    }
+}

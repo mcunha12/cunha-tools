@@ -19,16 +19,14 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.4.2</string>
+	<string>0.5.0</string>
 	<key>CFBundleVersion</key>
-	<string>6</string>
+	<string>7</string>
 	<key>CunhaToolGuide</key>
 	<array>
-		<string>Clique no ícone de onda sonora verde na barra de menus. O menu mostra o volume geral do Mac e os apps que tocam som.</string>
-		<string>Arraste o slider de um app para mudar só o volume dele. O volume geral é o teto de cada app.</string>
-		<string>Volume por aba no Chrome: no menu, clique na seta ao lado do Google Chrome e em Instalar extensão.</string>
-		<string>Em chrome://extensions, ligue o Modo do desenvolvedor, clique em Carregar sem compactação e escolha a pasta que o Finder abriu.</string>
-		<string>Recarregue as abas que já estavam abertas.</string>
+		<string>Mude o volume geral e o de cada app no card Volumes, nesta página, ou no ícone de onda sonora verde da barra de menus.</string>
+		<string>O volume geral é o teto de cada app.</string>
+		<string>Volume por aba no Chrome: no menu da barra, clique na seta ao lado do Chrome e em Instalar extensão. Em chrome://extensions, ligue o Modo do desenvolvedor e carregue a pasta que o Finder abriu.</string>
 	</array>
 	<key>CunhaToolRequirements</key>
 	<array>

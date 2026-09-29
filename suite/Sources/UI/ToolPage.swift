@@ -1,28 +1,24 @@
 import AppKit
+import CunhaKit
 import SwiftUI
 
 struct ToolPage: View {
-    enum Tab: String, CaseIterable, Identifiable {
-        case setup = "Configuração"
-        case guide = "Guia"
-
-        var id: String { rawValue }
-    }
-
     @EnvironmentObject private var tools: ToolsModel
     let entry: ToolsModel.Entry
     @Binding var page: Page
-    @State private var tab: Tab
+    @StateObject private var remote = SoundManagerRemote()
+    @State private var guideExpanded: Bool
     @State private var confirmingRemoval = false
 
     init(entry: ToolsModel.Entry, page: Binding<Page>, opensGuide: Bool = false) {
         self.entry = entry
         _page = page
-        _tab = State(initialValue: opensGuide || !(entry.needsSetup || entry.tool.guide.isEmpty) ? .guide : .setup)
+        _guideExpanded = State(initialValue: opensGuide)
     }
 
     private var tool: ToolBundle { entry.tool }
     private var busy: String? { tools.busy[entry.id] }
+    private var isSoundManager: Bool { entry.id == SoundChannel.bundleID }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -30,17 +26,12 @@ struct ToolPage: View {
                 StatusPill(text: entry.state.text, symbol: entry.state.symbol, color: entry.state.color, caption: "Versão \(entry.installed?.version ?? tool.version)")
             }
             hero
-            Picker("Seção", selection: $tab) {
-                ForEach(Tab.allCases) { Text($0.rawValue).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .fixedSize()
-            switch tab {
-            case .setup: ToolSetup(entry: entry, page: $page)
-            case .guide: ToolGuide(steps: tool.guide, tint: tool.tintColor)
-            }
+            if isSoundManager { VolumesCard(remote: remote, entry: entry) }
+            ToolSetup(entry: entry, page: $page, remote: isSoundManager ? remote : nil)
+            if !tool.guide.isEmpty { ToolGuide(steps: tool.guide, isExpanded: $guideExpanded) }
         }
+        .onAppear { if isSoundManager { remote.start() } }
+        .onDisappear(perform: remote.stop)
         .confirmationDialog("Remover \(tool.name)?", isPresented: $confirmingRemoval) {
             Button("Mover para o Lixo", role: .destructive) { tools.remove(entry) }
         } message: {
@@ -103,25 +94,25 @@ struct ToolPage: View {
     }
 }
 
+// Usage steps, collapsed at the bottom of the page.
 private struct ToolGuide: View {
     let steps: [String]
-    let tint: Color
+    @Binding var isExpanded: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            if steps.isEmpty { Hint(text: "Esta tool não tem guia.") }
-            ForEach(steps.indices, id: \.self) { index in
-                HStack(alignment: .top, spacing: 14) {
-                    Text("\(index + 1)")
-                        .font(.callout.weight(.bold))
-                        .foregroundStyle(tint)
-                        .frame(width: 28, height: 28)
-                        .background(Circle().fill(tint.opacity(0.16)))
-                    Text(steps[index]).fixedSize(horizontal: false, vertical: true).padding(.top, 5)
+        DisclosureGroup(isExpanded: $isExpanded) {
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(steps.indices, id: \.self) { index in
+                    Text("\(index + 1). \(steps[index])").fixedSize(horizontal: false, vertical: true)
                 }
             }
+            .font(.callout)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, 8)
+        } label: {
+            Text("Como usar").font(.callout.weight(.medium)).foregroundStyle(.secondary)
         }
-        .card(padding: 26)
     }
 }
 
