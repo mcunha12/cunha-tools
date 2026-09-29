@@ -44,4 +44,4 @@ App com janela única. Instala, atualiza, remove e configura as tools embutidas,
 | `CunhaTools --selftest-phone` | QR de pareamento e leitura das respostas do adb |
 | `CunhaTools --selftest-bonjour` | Busca e resolução mDNS de um serviço de pareamento falso |
 | `CunhaTools --selftest-platform-tools <pasta>` | Download e extração do platform-tools |
-| `CunhaTools --render-ui <saída.png> [--page inicio\|celular\|<tool>] [--guide] [--contribute] [--phone] [--qr] [--light\|--dark]` | Barra lateral e página renderizadas em PNG, sem split view. `--contribute` renderiza só o popup do Pix |
+| `CunhaTools --render-ui <saída.png> [--page inicio\|celular\|<tool>] [--guide] [--contribute] [--phone] [--qr] [--light\|--dark] [--width <pt>]` | Barra lateral e página renderizadas em PNG, sem split view. `--contribute` renderiza só o popup do Pix. `--width` define a largura da página, padrão 830 |
