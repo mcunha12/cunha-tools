@@ -17,12 +17,14 @@ func hasSwiftFiles(_ path: String) -> Bool {
 let apps: [(name: String, path: String)] = [
     ("CunhaTools", "suite"),
     ("SoundManager", "tools/sound-manager"),
+    ("PairFileSharing", "tools/pair-file-sharing"),
+    ("PairScreen", "tools/pair-screen"),
 ]
 
 var targets: [Target] = [
     .target(name: "CunhaKit", path: "shared/CunhaKit", swiftSettings: settings),
 ]
-// CUNHA_ONLY=tools/sound-manager,suite limits the package to those folders, so a broken tool does not block another tool's build.
+// CUNHA_ONLY=tools/pair-screen,suite limits the package to those folders, so a broken tool does not block another tool's build.
 let only = ProcessInfo.processInfo.environment["CUNHA_ONLY"].map { Set($0.split(separator: ",").map(String.init)) }
 for app in apps where hasSwiftFiles("\(app.path)/Sources") && (only?.contains(app.path) ?? true) {
     targets.append(.executableTarget(name: app.name, dependencies: ["CunhaKit"], path: "\(app.path)/Sources", swiftSettings: settings))

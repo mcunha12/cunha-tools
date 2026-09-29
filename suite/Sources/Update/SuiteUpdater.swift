@@ -32,6 +32,7 @@ final class SuiteUpdater: ObservableObject {
                 try await Self.updateInstalledTools(from: suite)
                 let destination = Self.suiteDestination
                 try await Self.replaceSuite(at: destination, with: suite)
+                await Self.trashPreviousSuites(keeping: destination)
                 UpdateBuilder.cleanUp()
                 Self.relaunch(destination)
             } catch {
@@ -77,12 +78,22 @@ final class SuiteUpdater: ObservableObject {
         }.value
     }
 
-    // In place, unless the suite runs from a read-only place such as a DMG or App Translocation.
+    // Always the install folder, wherever the running copy is: build/, Downloads or a DMG.
     static var suiteDestination: URL {
         let current = Bundle.main.bundleURL
-        let folder = current.deletingLastPathComponent()
-        if !current.path.contains("/AppTranslocation/"), FileManager.default.isWritableFile(atPath: folder.path) { return current }
-        return InstallLocation.defaultDirectory.appendingPathComponent(current.lastPathComponent, isDirectory: true)
+        guard let suite = ToolBundle(url: current) else { return InstallLocation.defaultDirectory.appendingPathComponent(current.lastPathComponent, isDirectory: true) }
+        return InstallLocation.destination(for: suite)
+    }
+
+    // Other copies in the install folders and the running copy go to the Trash; a DMG or App Translocation copy stays.
+    static func trashPreviousSuites(keeping destination: URL) async {
+        guard let bundleID = Bundle.main.bundleIdentifier else { return }
+        var copies = InstallLocation.otherCopies(of: bundleID, keeping: destination)
+        let current = Bundle.main.bundleURL
+        if current.realPath != destination.realPath, !current.path.contains("/AppTranslocation/"), !copies.map(\.realPath).contains(current.realPath) {
+            copies.append(current)
+        }
+        await ToolInstaller.trash(copies)
     }
 
     // A detached shell waits for this process to exit, then opens the new copy.

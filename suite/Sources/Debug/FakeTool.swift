@@ -20,7 +20,7 @@ enum FakeTool {
             "CFBundleShortVersionString": version,
             "CFBundleVersion": build,
             "CunhaToolSummary": "Tool falsa do autoteste.",
-            "CunhaToolRequirements": ["audioCapture", "localNetwork", "desconhecido"],
+            "CunhaToolRequirements": ["audioCapture", "phone", "desconhecido"],
             "CunhaToolSymbol": "testtube.2",
         ]
         let plist = try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0)

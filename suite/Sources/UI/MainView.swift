@@ -1,67 +1,68 @@
 import AppKit
 import SwiftUI
 
+enum Page: Hashable {
+    case overview
+    case tool(String)
+    case phone
+}
+
 struct MainView: View {
     @EnvironmentObject private var tools: ToolsModel
-    var scrolls = true
+    @State private var page = Page.overview
 
     var body: some View {
-        if scrolls {
-            ScrollView { content }
-        } else {
-            content
+        NavigationSplitView {
+            Sidebar(page: $page, showsPhone: tools.needsPhone)
+                .navigationSplitViewColumnWidth(min: 230, ideal: 250, max: 320)
+        } detail: {
+            ScrollView { PageContent(page: $page, showsPhone: tools.needsPhone) }
+                .background(Palette.canvas)
+                .navigationTitle("Cunha Tools")
         }
+        .tint(Palette.accent)
     }
+}
 
-    private var content: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            header
-            SectionTitle(text: "Ferramentas")
-            if tools.entries.isEmpty {
-                Text("Esta versão da suíte não tem tools.").foregroundStyle(.secondary)
+struct PageContent: View {
+    @EnvironmentObject private var tools: ToolsModel
+    @Binding var page: Page
+    let showsPhone: Bool
+    var opensGuide = false
+
+    var body: some View {
+        Group {
+            switch page {
+            case .overview:
+                OverviewPage(page: $page, showsPhone: showsPhone)
+            case .phone:
+                PhonePage()
+            case let .tool(id):
+                if let entry = tools.entries.first(where: { $0.id == id }) {
+                    ToolPage(entry: entry, page: $page, opensGuide: opensGuide).id(id)
+                } else {
+                    OverviewPage(page: $page, showsPhone: showsPhone)
+                }
             }
-            ForEach(tools.entries) { ToolCard(entry: $0) }
         }
-        .padding(20)
+        .padding(.horizontal, 36)
+        .padding(.vertical, 30)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
+}
 
-    private var header: some View {
-        HStack(spacing: 12) {
-            Image(nsImage: NSApp.applicationIconImage)
-                .resizable()
-                .frame(width: 44, height: 44)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Cunha Tools").font(.title2.weight(.semibold))
-                Text(versionLine)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 12)
-            UpdateBar()
+extension ToolsModel.Entry {
+    var needsSetup: Bool { installed == nil || status?.setupComplete == false }
+
+    // One status per tool, shared by the sidebar, the tiles and the tool page.
+    var state: (text: String, symbol: String, color: Color) {
+        switch phase {
+        case .notInstalled: return ("Não instalada", "arrow.down.circle", .secondary)
+        case .updateAvailable: return ("Atualização disponível", "arrow.triangle.2.circlepath", .orange)
+        case .installed:
+            if status?.setupComplete == false { return ("Falta configurar", "exclamationmark.circle.fill", .orange) }
+            return isRunning ? ("Aberta", "checkmark.circle.fill", Palette.accent) : ("Instalada", "checkmark.circle", Palette.closed)
         }
-    }
-
-    private var versionLine: String {
-        let commit = SuiteUpdater.installedCommit.map { " · commit \($0.prefix(7))" } ?? ""
-        return "Versão \(Bundle.main.shortVersion)\(commit) · instala em \(InstallLocation.defaultDirectory.abbreviatedPath)"
-    }
-}
-
-struct SectionTitle: View {
-    let text: String
-
-    var body: some View {
-        Text(text).font(.headline)
-    }
-}
-
-extension View {
-    func card() -> some View {
-        padding(14)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(RoundedRectangle(cornerRadius: 10).fill(Color(nsColor: .controlBackgroundColor)))
-            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Color(nsColor: .separatorColor).opacity(0.6)))
     }
 }
 
@@ -71,4 +72,7 @@ extension Bundle {
 
 extension URL {
     var abbreviatedPath: String { (path as NSString).abbreviatingWithTildeInPath }
+
+    // /tmp and /private/tmp compare equal.
+    var realPath: String { resolvingSymlinksInPath().path }
 }

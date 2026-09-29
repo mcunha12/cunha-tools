@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>pt-BR</string>
+	<key>CFBundleDisplayName</key>
+	<string>Pair Screen</string>
+	<key>CFBundleExecutable</key>
+	<string>PairScreen</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.marcelocunha.pairscreen</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Pair Screen</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>CunhaToolGuide</key>
+	<array>
+		<string>Na página Celular, pareie o celular.</string>
+		<string>Clique no ícone da tool na barra de menus e em Conectar. A tela do celular abre numa janela flutuante.</string>
+		<string>Clique e arraste para tocar e deslizar. Botão direito volta. Botão do meio vai para o início. ⌘V cola o clipboard do Mac no celular.</string>
+		<string>Arraste a janela pela faixa superior, ou com ⌥ + arrastar em qualquer ponto.</string>
+		<string>No menu da tool: resolução, fps, bitrate, codec, Sempre no topo e Desligar a tela do celular durante o espelhamento.</string>
+	</array>
+	<key>CunhaToolRequirements</key>
+	<array>
+		<string>phone</string>
+	</array>
+	<key>CunhaToolSummary</key>
+	<string>Espelha e controla a tela do celular numa janela flutuante no Mac.</string>
+	<key>CunhaToolSymbol</key>
+	<string>iphone.gen3.radiowaves.left.and.right</string>
+	<key>CunhaToolTint</key>
+	<string>#8A5CF0</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>15.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+</dict>
+</plist>

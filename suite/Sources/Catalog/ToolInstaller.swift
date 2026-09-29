@@ -17,7 +17,18 @@ enum ToolInstaller {
             try replace(destination, with: source)
             removeQuarantine(destination)
         }.value
+        await trash(InstallLocation.otherCopies(of: tool.bundleID, keeping: destination))
         return destination
+    }
+
+    // One item per call, so a copy on a read-only volume does not keep the others out of the Trash. Returns the Trash locations.
+    @discardableResult
+    static func trash(_ copies: [URL]) async -> [URL] {
+        var trashed: [URL] = []
+        for copy in copies {
+            if let location = try? await NSWorkspace.shared.recycle([copy])[copy] { trashed.append(location) }
+        }
+        return trashed
     }
 
     // Returns where the bundle landed in the Trash.

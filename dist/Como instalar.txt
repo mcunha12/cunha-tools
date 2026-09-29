@@ -7,14 +7,30 @@ Requisito: macOS 15 ou superior.
 3. Abra Ajustes do Sistema > Privacidade e Segurança. Role até "Segurança" e clique em "Abrir Mesmo Assim". Confirme com a senha do Mac.
    Alternativa no Terminal:
    xattr -dr com.apple.quarantine "/Applications/Cunha Tools.app"
-4. Na janela do Cunha Tools, clique em "Instalar" na tool que quiser. A tool vai para a pasta Aplicativos e abre.
-5. Cada tool pede as próprias permissões na primeira abertura. O cartão da tool mostra o que falta. "Configurar" abre o ajuste da tool.
-6. "Abrir ao iniciar o Mac" liga ou desliga a abertura automática de cada tool.
+4. Na página Início do Cunha Tools, clique em "Instalar tudo". As tools vão para a pasta Aplicativos e abrem. A página de cada tool, na barra lateral, também tem "Instalar".
+5. Cada tool pede as próprias permissões na primeira abertura. A aba Configuração da página da tool mostra o que falta. "Configurar" abre o ajuste da tool.
+6. "Abrir ao iniciar o Mac", na mesma aba, liga ou desliga a abertura automática de cada tool.
 
 O Cunha Tools fecha quando a janela fecha. As tools continuam abertas.
-Para atualizar: abra a versão nova do Cunha Tools e clique em "Atualizar" no cartão da tool.
-Para remover: clique em "Remover". A tool fecha e vai para o Lixo.
+Para atualizar: clique em "Atualizar", no rodapé da barra lateral. O Cunha Tools baixa o código novo do GitHub, compila, troca as tools e reabre. As cópias antigas do Cunha Tools vão para o Lixo. A atualização exige o Command Line Tools: no Terminal, xcode-select --install.
+Para remover: clique em "Remover" na página da tool. A tool fecha e vai para o Lixo.
 Se o macOS bloquear a atualização ou a remoção, ative o Cunha Tools em Ajustes do Sistema > Privacidade e Segurança > Gerenciamento de apps.
+
+
+CELULAR ANDROID (tools que usam o celular)
+
+O Mac e o celular precisam estar na mesma rede Wi-Fi.
+
+1. Samsung: Configurações > Segurança e privacidade > Bloqueador automático > desligado. Com ele ligado, o celular recusa comandos por USB e apps fora da loja.
+2. Configurações > Sobre o telefone > Informações de software > toque 7 vezes em "Número de compilação".
+3. Configurações > Opções do desenvolvedor > ligue "Depuração sem fio".
+4. No Cunha Tools, página Celular, clique em "Instalar ferramentas Android". O download tem 16 MB e vem do Google.
+5. Clique em "Mostrar QR de pareamento". Quando o macOS perguntar sobre a rede local, clique em "Permitir".
+6. No celular: Depuração sem fio > Parear o dispositivo com um código QR. Aponte a câmera para o QR na tela do Mac.
+7. Clique em "Instalar no celular" para instalar o app companheiro. Se o Play Protect perguntar, toque em "Instalar mesmo assim".
+
+Sem QR: use "Parear com código" e digite o IP, a porta e o código da tela "Parear o dispositivo com código de pareamento".
+Por cabo USB: conecte o cabo e toque em "Permitir" no aviso de depuração USB do celular.
 
 
 SOUND MANAGER

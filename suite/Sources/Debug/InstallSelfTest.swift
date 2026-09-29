@@ -35,7 +35,7 @@ enum InstallSelfTest {
             return checker.fail("catálogo não leu a tool falsa")
         }
         checker.check(v1.bundleID == FakeTool.bundleID && v1.summary == "Tool falsa do autoteste." && v1.symbol == "testtube.2", "catálogo lê CFBundleIdentifier, CunhaToolSummary e CunhaToolSymbol")
-        checker.check(v1.requirements == [.audioCapture, .localNetwork], "catálogo lê CunhaToolRequirements e ignora valor desconhecido")
+        checker.check(v1.requirements == [.audioCapture, .phone], "catálogo lê CunhaToolRequirements e ignora valor desconhecido")
 
         let model = ToolsModel(tools: [v1])
         checker.check(model.entries.first?.phase == .notInstalled, "estado inicial: não instalada")
@@ -50,7 +50,12 @@ enum InstallSelfTest {
 
         let updateModel = ToolsModel(tools: [v2])
         checker.check(updateModel.entries.first?.phase == .updateAvailable, "detecta atualização 1.0.0 → 1.1.0")
+        let duplicate = installDir.appendingPathComponent("Cunha Selftest antiga.app", isDirectory: true)
+        try? FileManager.default.removeItem(at: duplicate)
+        try FileManager.default.copyItem(at: installed, to: duplicate)
         _ = try await ToolInstaller.install(v2)
+        checker.check(!FileManager.default.fileExists(atPath: duplicate.path), "atualização manda a cópia antiga para o Lixo")
+        try? FileManager.default.removeItem(at: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".Trash/\(duplicate.lastPathComponent)"))
         updateModel.refresh()
         checker.check(updateModel.entries.first?.installed?.version.short == "1.1.0" && updateModel.entries.first?.phase == .installed, "atualiza para 1.1.0")
         let leftovers = (try? FileManager.default.contentsOfDirectory(atPath: installDir.path))?.filter { $0.hasSuffix(".cunha-new") } ?? []

@@ -28,6 +28,15 @@ enum InstallLocation {
         return nil
     }
 
+    // Copies of the bundle in the install folders under any file name, except the one kept.
+    static func otherCopies(of bundleID: String, keeping kept: URL) -> [URL] {
+        return candidates.flatMap { folder in
+            ((try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? []).filter {
+                $0.pathExtension == "app" && $0.realPath != kept.realPath && ToolBundle(url: $0)?.bundleID == bundleID
+            }
+        }
+    }
+
     // An update replaces the copy where it already is; a first install goes to the default folder.
     static func destination(for tool: ToolBundle) -> URL {
         installedCopy(of: tool)?.url ?? defaultDirectory.appendingPathComponent(tool.url.lastPathComponent, isDirectory: true)
