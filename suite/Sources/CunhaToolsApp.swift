@@ -16,10 +16,11 @@ struct CunhaToolsApp: App {
         Window("Cunha Tools", id: "main") {
             MainView()
                 .environmentObject(delegate.tools)
+                .environmentObject(delegate.phone)
                 .environmentObject(delegate.updater)
-                .frame(minWidth: 560, minHeight: 520)
+                .frame(minWidth: 820, minHeight: 600)
         }
-        .defaultSize(width: 600, height: 780)
+        .defaultSize(width: 1080, height: 760)
         .windowResizability(.contentMinSize)
         .commands { CommandGroup(replacing: .newItem) {} }
     }
@@ -28,8 +29,18 @@ struct CunhaToolsApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let tools = ToolsModel()
+    let phone = PhoneModel()
     let updater = SuiteUpdater()
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        Appearance.current.apply()
+        if tools.needsPhone { phone.start() }
+    }
 
     // The suite is a manager, not a resident app: closing the window quits it.
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        phone.stop()
+    }
 }

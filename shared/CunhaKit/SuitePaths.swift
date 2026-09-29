@@ -15,4 +15,8 @@ public enum SuitePaths {
         try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         return url
     }
+
+    public static var platformTools: URL {
+        support.appendingPathComponent("platform-tools", isDirectory: true)
+    }
 }

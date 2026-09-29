@@ -3,13 +3,26 @@ import Foundation
 enum ToolRequirement: String, CaseIterable, Sendable {
     case audioCapture
     case localNetwork
+    case phone
 
     var title: String {
         switch self {
         case .audioCapture: "Gravação de áudio do sistema"
         case .localNetwork: "Rede local"
+        case .phone: "Celular pareado"
         }
     }
+
+    var symbol: String {
+        switch self {
+        case .audioCapture: "waveform"
+        case .localNetwork: "network"
+        case .phone: "iphone"
+        }
+    }
+
+    // The tool asks macOS for these itself; the suite only shows what the tool publishes.
+    var isGrantedByTool: Bool { self != .phone }
 }
 
 struct BundleVersion: Comparable, Sendable, CustomStringConvertible {
@@ -49,6 +62,8 @@ struct ToolBundle: Identifiable, Sendable {
     let summary: String?
     let requirements: [ToolRequirement]
     let symbol: String?
+    let tint: String?
+    let guide: [String]
     let iconURL: URL?
 
     var id: String { bundleID }
@@ -65,6 +80,8 @@ struct ToolBundle: Identifiable, Sendable {
         summary = info["CunhaToolSummary"] as? String
         requirements = (info["CunhaToolRequirements"] as? [String] ?? []).compactMap(ToolRequirement.init(rawValue:))
         symbol = info["CunhaToolSymbol"] as? String
+        tint = info["CunhaToolTint"] as? String
+        guide = info["CunhaToolGuide"] as? [String] ?? []
         iconURL = Self.iconURL(bundle: url, iconFile: info["CFBundleIconFile"] as? String)
     }
 

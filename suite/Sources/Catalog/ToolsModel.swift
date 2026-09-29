@@ -47,6 +47,8 @@ final class ToolsModel: ObservableObject {
         })
     }
 
+    var needsPhone: Bool { tools.contains { $0.requirements.contains(.phone) } }
+
     func refresh() {
         entries = tools.map { tool in
             Entry(tool: tool, installed: InstallLocation.installedCopy(of: tool), isRunning: RunningTool.isRunning(tool.bundleID), status: ToolStatus.read(bundleID: tool.bundleID))
@@ -68,6 +70,12 @@ final class ToolsModel: ObservableObject {
             self.refresh()
             try await RunningTool.open(url)
         }
+    }
+
+    var pending: [Entry] { entries.filter { $0.phase != .installed } }
+
+    func installPending() {
+        pending.forEach(install)
     }
 
     func remove(_ entry: Entry) {

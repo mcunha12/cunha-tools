@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>pt-BR</string>
+	<key>CFBundleDisplayName</key>
+	<string>Pair File Sharing</string>
+	<key>CFBundleExecutable</key>
+	<string>PairFileSharing</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.marcelocunha.pairfilesharing</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Pair File Sharing</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>CunhaToolGuide</key>
+	<array>
+		<string>Na página Celular, pareie o celular e instale o app companheiro.</string>
+		<string>Clique no ícone da tool na barra de menus e escolha Parear celular. Com o adb conectado, o pareamento é automático. Sem adb, a janela mostra um QR para a câmera do celular.</string>
+		<string>Mac para celular: arraste arquivos ou pastas para o ícone da barra de menus. Também funciona por Escolher arquivos… e por Finder → Serviços → Enviar para o celular.</string>
+		<string>Celular para Mac: Compartilhar → Enviar para o Mac. Os arquivos chegam em ~/Downloads/Pair File Sharing.</string>
+		<string>O Mac e o celular precisam estar na mesma rede Wi-Fi.</string>
+	</array>
+	<key>CunhaToolRequirements</key>
+	<array>
+		<string>localNetwork</string>
+		<string>phone</string>
+	</array>
+	<key>CunhaToolSummary</key>
+	<string>Transferência rápida de arquivos entre o Mac e o celular pela rede Wi-Fi.</string>
+	<key>CunhaToolSymbol</key>
+	<string>arrow.up.arrow.down.circle.fill</string>
+	<key>CunhaToolTint</key>
+	<string>#3B8BEB</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>15.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_cunhapfs._tcp</string>
+	</array>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>O Pair File Sharing troca arquivos com o seu celular pela rede Wi-Fi local.</string>
+	<key>NSServices</key>
+	<array>
+		<dict>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>Enviar para o celular</string>
+			</dict>
+			<key>NSMessage</key>
+			<string>sendToPhone</string>
+			<key>NSPortName</key>
+			<string>Pair File Sharing</string>
+			<key>NSRequiredContext</key>
+			<dict/>
+			<key>NSSendFileTypes</key>
+			<array>
+				<string>public.item</string>
+			</array>
+			<key>NSUserData</key>
+			<string>send</string>
+		</dict>
+	</array>
+</dict>
+</plist>
