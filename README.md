@@ -17,7 +17,7 @@ Pair File Sharing e Pair Screen usam o app Android companheiro, em `android/`. O
 - A barra lateral lista a página Início, uma página por tool e a página Celular.
 - A página Início mostra o que falta instalar, atualizar ou configurar. O botão principal resolve o primeiro item.
 - A página de cada tool tem duas abas. **Configuração**: permissões, celular e abertura no login. **Guia**: os passos de uso.
-- O rodapé da barra lateral tem **Atualizar**, **Contribua** (chave Pix) e **Aparência** (Sistema, Claro ou Escuro).
+- O rodapé da barra lateral tem **Atualizar**, **Contribua** (QR Pix e código copia e cola) e **Aparência** (Sistema, Claro ou Escuro).
 
 ## Sound Manager
 
