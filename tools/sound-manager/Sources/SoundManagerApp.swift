@@ -21,7 +21,7 @@ struct SoundManagerApp: App {
                 .environmentObject(delegate.bridge)
                 .environmentObject(delegate.launchAtLogin)
         } label: {
-            Image(systemName: "speaker.wave.2.fill")
+            Image(nsImage: MenuBarIcon.image).renderingMode(.original)
         }
         .menuBarExtraStyle(.window)
     }

@@ -36,7 +36,7 @@ Por cabo USB: conecte o cabo e toque em "Permitir" no aviso de depuração USB d
 SOUND MANAGER
 
 Na primeira abertura, clique em "Permitir" no pedido de "Gravação de áudio do sistema". Sem essa permissão, o volume por app não funciona.
-O ícone de alto-falante aparece na barra de menus.
+O ícone de onda sonora verde aparece na barra de menus.
 
 Volume por aba no Chrome:
 
